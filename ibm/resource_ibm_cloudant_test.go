@@ -33,7 +33,9 @@ func TestAccIBMCloudant_basic(t *testing.T) {
 					testAccCheckIBMCloudantExists(resourceName, conf),
 					resource.TestCheckResourceAttr(resourceName, "name", serviceName),
 					resource.TestCheckResourceAttr(resourceName, "service", "cloudantnosqldb"),
-					resource.TestCheckResourceAttr(resourceName, "plan", "lite"),
+					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
+					resource.TestCheckResourceAttr(resourceName, "legacy_credentials", "true"),
+					resource.TestCheckResourceAttr(resourceName, "hipaa", "false"),
 				),
 			},
 			{
@@ -41,7 +43,9 @@ func TestAccIBMCloudant_basic(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", updateName),
 					resource.TestCheckResourceAttr(resourceName, "service", "cloudantnosqldb"),
-					resource.TestCheckResourceAttr(resourceName, "plan", "lite"),
+					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
+					resource.TestCheckResourceAttr(resourceName, "legacy_credentials", "true"),
+					resource.TestCheckResourceAttr(resourceName, "hipaa", "false"),
 				),
 			},
 		},
@@ -59,7 +63,7 @@ func TestAccIBMCloudant_import(t *testing.T) {
 		CheckDestroy: testAccCheckIBMCloudantDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckIBMCloudantResourceConfig(serviceName),
+				Config: testAccCheckIBMCloudantResourceConfigLite(serviceName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccCheckIBMCloudantExists(resourceName, conf),
 					resource.TestCheckResourceAttr(resourceName, "name", serviceName),
@@ -135,12 +139,29 @@ func testAccCheckIBMCloudantResourceConfig(serviceName string) string {
 	return fmt.Sprintf(`
 
 	resource "ibm_cloudant" "instance" {
-		name     = "%s"
-		plan     = "lite"
-		location = "us-south"
-		parameters = {
-		  "legacyCredentials" = true
+		name               = "%s"
+		plan               = "standard"
+		location           = "us-south"
+		legacy_credentials = true
+		hipaa              = false
+
+		timeouts {
+		  create = "15m"
+		  update = "15m"
+		  delete = "15m"
 		}
+	  }
+
+	`, serviceName)
+}
+
+func testAccCheckIBMCloudantResourceConfigLite(serviceName string) string {
+	return fmt.Sprintf(`
+
+	resource "ibm_cloudant" "instance" {
+		name               = "%s"
+		plan               = "lite"
+		location           = "us-south"
 
 		timeouts {
 		  create = "15m"
