@@ -7,10 +7,11 @@ require (
 	github.com/IBM-Cloud/bluemix-go v0.0.0-20210419045805-b50610722085
 	github.com/IBM-Cloud/power-go-client v1.0.55
 	github.com/IBM/apigateway-go-sdk v0.0.0-20200414212859-416e5948678a
+	github.com/IBM/cloudant-go-sdk v0.0.33 // indirect
 	github.com/IBM/go-sdk-core v1.1.0
 	github.com/IBM/go-sdk-core/v3 v3.3.1
 	github.com/IBM/go-sdk-core/v4 v4.10.0
-	github.com/IBM/go-sdk-core/v5 v5.3.0
+	github.com/IBM/go-sdk-core/v5 v5.4.2
 	github.com/IBM/ibm-cos-sdk-go v1.6.1
 	github.com/IBM/ibm-cos-sdk-go-config v1.1.0
 	github.com/IBM/keyprotect-go-client v0.7.0

@@ -35,17 +35,24 @@ func TestAccIBMCloudant_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "service", "cloudantnosqldb"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "legacy_credentials", "true"),
-					resource.TestCheckResourceAttr(resourceName, "hipaa", "false"),
+					resource.TestCheckResourceAttr(resourceName, "hipaa", "true"),
+					resource.TestCheckResourceAttr(resourceName, "audit_event_types.0", "management"),
+					resource.TestCheckResourceAttr(resourceName, "capacity.0.throughput.0.query", "5"),
+					resource.TestCheckResourceAttr(resourceName, "cors.0.enable_cors", "false"),
 				),
 			},
 			{
-				Config: testAccCheckIBMCloudantResourceConfig(updateName),
+				Config: testAccCheckIBMCloudantResourceUpdateConfig(updateName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", updateName),
 					resource.TestCheckResourceAttr(resourceName, "service", "cloudantnosqldb"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "legacy_credentials", "true"),
 					resource.TestCheckResourceAttr(resourceName, "hipaa", "false"),
+					resource.TestCheckResourceAttr(resourceName, "audit_event_types.0", "management"),
+					resource.TestCheckResourceAttr(resourceName, "capacity.0.throughput.0.query", "10"),
+					resource.TestCheckResourceAttr(resourceName, "cors.0.enable_cors", "true"),
+					resource.TestCheckResourceAttr(resourceName, "cors.0.origins.0", "https://example.com"),
 				),
 			},
 		},
@@ -69,6 +76,10 @@ func TestAccIBMCloudant_import(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", serviceName),
 					resource.TestCheckResourceAttr(resourceName, "service", "cloudantnosqldb"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "lite"),
+					resource.TestCheckResourceAttr(resourceName, "legacy_credentials", "true"),
+					resource.TestCheckResourceAttr(resourceName, "audit_event_types.0", "management"),
+					resource.TestCheckResourceAttr(resourceName, "capacity.0.throughput.0.query", "5"),
+					resource.TestCheckResourceAttr(resourceName, "cors.0.enable_cors", "false"),
 				),
 			},
 			{
@@ -143,7 +154,61 @@ func testAccCheckIBMCloudantResourceConfig(serviceName string) string {
 		plan               = "standard"
 		location           = "us-south"
 		legacy_credentials = true
+		hipaa              = true
+
+		audit_event_types = [
+			"management",
+		]
+
+		capacity {
+			throughput {
+				blocks = 1
+			}
+		}
+
+		cors {
+			enable_cors       = false
+			allow_credentials = true
+			origins           = []
+		}
+
+		timeouts {
+		  create = "15m"
+		  update = "15m"
+		  delete = "15m"
+		}
+	  }
+
+	`, serviceName)
+}
+
+func testAccCheckIBMCloudantResourceUpdateConfig(serviceName string) string {
+	return fmt.Sprintf(`
+
+	resource "ibm_cloudant" "instance" {
+		name               = "%s"
+		plan               = "standard"
+		location           = "us-south"
+		legacy_credentials = true
 		hipaa              = false
+
+		audit_event_types = [
+			"management",
+		]
+
+		capacity {
+			throughput {
+				blocks = 2
+			}
+		}
+
+		cors {
+			enable_cors       = true
+			allow_credentials = true
+			origins           = [
+				"https://example.com"
+			]
+		}
 
 		timeouts {
 		  create = "15m"
@@ -162,6 +227,22 @@ func testAccCheckIBMCloudantResourceConfigLite(serviceName string) string {
 		name               = "%s"
 		plan               = "lite"
 		location           = "us-south"
+
+		audit_event_types = [
+			"management",
+		]
+
+		capacity {
+			throughput {
+				blocks = 0
+			}
+		}
+
+		cors {
+			enable_cors       = false
+			allow_credentials = true
+			origins           = []
+		}
 
 		timeouts {
 		  create = "15m"
