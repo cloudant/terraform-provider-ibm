@@ -16,6 +16,30 @@ func dataSourceIBMCloudant() *schema.Resource {
 		Computed:    true,
 	}
 
+	riSchema["version"] = &schema.Schema{
+		Type:        schema.TypeString,
+		Computed:    true,
+		Description: "Vendor version.",
+	}
+
+	riSchema["features"] = &schema.Schema{
+		Type:        schema.TypeList,
+		Computed:    true,
+		Description: "List of enabled optional features.",
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
+		},
+	}
+
+	riSchema["features_flags"] = &schema.Schema{
+		Type:        schema.TypeList,
+		Computed:    true,
+		Description: "List of feature flags.",
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
+		},
+	}
+
 	riSchema["audit_event_types"] = &schema.Schema{
 		Description: "An array of event types that are being sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. \"management\" is a required element of this array.",
 		Type:        schema.TypeList,
@@ -108,6 +132,11 @@ func dataSourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	client, err := getCloudantClient(d, meta)
+	if err != nil {
+		return err
+	}
+
+	err = setCloudantServerInformation(client, d)
 	if err != nil {
 		return err
 	}

@@ -378,6 +378,36 @@ func getCloudantClient(d *schema.ResourceData, meta interface{}) (*cloudantv1.Cl
 	return client, nil
 }
 
+func setCloudantServerInformation(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+	serverInformation, err := readCloudantServerInformation(client)
+	if err != nil {
+		return fmt.Errorf("Error retrieving server information: %s", err)
+	}
+
+	if serverInformation.Vendor != nil && serverInformation.Vendor.Version != nil {
+		d.Set("version", serverInformation.Vendor.Version)
+	}
+
+	if serverInformation.Features != nil {
+		d.Set("features", serverInformation.Features)
+	}
+
+	if serverInformation.FeaturesFlags != nil {
+		d.Set("features_flags", serverInformation.FeaturesFlags)
+	}
+	return nil
+}
+
+func readCloudantServerInformation(client *cloudantv1.CloudantV1) (*cloudantv1.ServerInformation, error) {
+	opts := client.NewGetServerInformationOptions()
+
+	serverInformation, response, err := client.GetServerInformation(opts)
+	if err != nil {
+		log.Printf("[DEBUG] Error retrieving server information: %s\n%s", err, response)
+	}
+	return serverInformation, err
+}
+
 func setCloudantInstanceAuditEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	activityTrackerEvents, err := readCloudantInstanceAuditEventTypes(client)
 	if err != nil {
