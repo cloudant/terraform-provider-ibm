@@ -11,9 +11,9 @@ func dataSourceIBMCloudant() *schema.Resource {
 	riSchema := dataSourceIBMResourceInstance().Schema
 
 	riSchema["service"] = &schema.Schema{
-		Description: "The service type of the instance",
 		Type:        schema.TypeString,
 		Computed:    true,
+		Description: "The service type of the instance",
 	}
 
 	riSchema["version"] = &schema.Schema{
@@ -40,69 +40,45 @@ func dataSourceIBMCloudant() *schema.Resource {
 		},
 	}
 
-	riSchema["audit_event_types"] = &schema.Schema{
-		Description: "An array of event types that are being sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. \"management\" is a required element of this array.",
-		Type:        schema.TypeList,
+	riSchema["include_data_events"] = &schema.Schema{
+		Type:        schema.TypeBool,
 		Computed:    true,
-		Elem:        &schema.Schema{Type: schema.TypeString},
+		Description: "Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of \"management\" type.",
 	}
 
 	riSchema["capacity"] = &schema.Schema{
-		Description: "Detailed information about provisioned throughput capacity.",
-		Type:        schema.TypeList,
+		Type:        schema.TypeInt,
 		Computed:    true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"throughput": &schema.Schema{
-					Type:        schema.TypeList,
-					Computed:    true,
-					Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"blocks": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.",
-							},
-							"query": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "Provisioned global queries capacity in operations per second.",
-							},
-							"read": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "Provisioned reads capacity in operations per second.",
-							},
-							"write": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "Provisioned writes capacity in operations per second.",
-							},
-						},
-					},
-				},
-			},
+		Description: "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.",
+	}
+
+	riSchema["throughput"] = &schema.Schema{
+		Type:        schema.TypeMap,
+		Computed:    true,
+		Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
+		Elem: &schema.Schema{
+			Type: schema.TypeInt,
 		},
 	}
 
-	riSchema["cors"] = &schema.Schema{
-		Description: "Detailed information about CORS configuration.",
+	riSchema["enable_cors"] = &schema.Schema{
+		Type:        schema.TypeBool,
+		Computed:    true,
+		Description: "Boolean value to turn CORS on and off.",
+	}
+
+	riSchema["cors_config"] = &schema.Schema{
 		Type:        schema.TypeList,
 		Computed:    true,
+		Description: "Configuration for CORS.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"allow_credentials": {
+				"allow_credentials": &schema.Schema{
 					Type:        schema.TypeBool,
 					Computed:    true,
 					Description: "Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.",
 				},
-				"enable_cors": {
-					Type:        schema.TypeBool,
-					Computed:    true,
-					Description: "Boolean value to turn CORS on and off.",
-				},
-				"origins": {
+				"origins": &schema.Schema{
 					Type:        schema.TypeList,
 					Computed:    true,
 					Description: "An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.",
@@ -141,7 +117,7 @@ func dataSourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	err = setCloudantInstanceAuditEventTypes(client, d)
+	err = setCloudantActivityTrackerEvents(client, d)
 	if err != nil {
 		return err
 	}
