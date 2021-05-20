@@ -5,7 +5,7 @@ variable "ibmcloud_api_key" {
 
 // Resource arguments for cloudant_activity_tracker_events
 variable "cloudant_activity_tracker_events_types" {
-  description = "An array of event types that are being sent to IBM Cloud Activity Tracker for the IBM Cloudant instance. Allowable values: management, data. "management" is a required element of this array."
+  description = "An array of event types that are being sent to IBM Cloud Activity Tracker for the IBM Cloudant instance. Allowable values: management, data. \"management\" is a required element of this array."
   type        = list(string)
   default     = [ "management" ]
 }
