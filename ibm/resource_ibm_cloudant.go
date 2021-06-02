@@ -71,7 +71,7 @@ func resourceIBMCloudant() *schema.Resource {
 		Description:  "CRN of the encryption key that is stored in the Key Protect instance",
 	}
 
-	riSchema["emit_data_event_types"] = &schema.Schema{
+	riSchema["include_data_events"] = &schema.Schema{
 		Description: "Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of \"management\" type.",
 		Type:        schema.TypeBool,
 		Optional:    true,
@@ -89,7 +89,7 @@ func resourceIBMCloudant() *schema.Resource {
 	riSchema["enable_cors"] = &schema.Schema{
 		Description: "Boolean value to turn CORS on and off.",
 		Type:        schema.TypeBool,
-		Default:     true,
+		Default:     false,
 		Optional:    true,
 	}
 
@@ -106,8 +106,6 @@ func resourceIBMCloudant() *schema.Resource {
 					Type:        schema.TypeBool,
 					Default:     true,
 					Optional:    true,
-					// no clue how to set it on deep struct
-					// RequiredWith: []string{"cors_config.origins"},
 				},
 				"origins": &schema.Schema{
 					Description: "An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.",
@@ -116,7 +114,6 @@ func resourceIBMCloudant() *schema.Resource {
 					Elem: &schema.Schema{
 						Type: schema.TypeString,
 					},
-					// RequiredWith: []string{"cors_config.allow_credentials"},
 				},
 			},
 		},
@@ -193,8 +190,8 @@ func resourceIBMCloudantCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	plan := d.Get("plan").(string)
-	capacity, ok := d.GetOk("capacity")
-	if ok && plan == "lite" {
+	capacity := d.Get("capacity").(int)
+	if capacity > 1 && plan == "lite" {
 		return fmt.Errorf("Setting capacity is not supported for your instance's plan.")
 	}
 
@@ -211,26 +208,23 @@ func resourceIBMCloudantCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if d.Get("emit_data_event_types").(bool) {
-		err := updateCloudantEmitDataEventTypes(client, d)
+	if d.Get("include_data_events").(bool) {
+		err := updateCloudantIncludeDataEventTypes(client, d)
 		if err != nil {
 			return fmt.Errorf("Error updating activity tracker events: %s", err)
 		}
 	}
 
-	if capacity.(int) > 1 {
+	if capacity > 1 {
 		err := updateCloudantInstanceCapacity(client, d)
 		if err != nil {
 			return fmt.Errorf("Error retrieving capacity throughput information: %s", err)
 		}
 	}
 
-	enableCORS := d.Get("enable_cors").(bool)
-	if enableCORS {
-		err := updateCloudantInstanceCors(client, d)
-		if err != nil {
-			return fmt.Errorf("Error updating CORS settings: %s", err)
-		}
+	err = updateCloudantInstanceCors(client, d)
+	if err != nil {
+		return fmt.Errorf("Error updating CORS settings: %s", err)
 	}
 
 	return resourceIBMCloudantRead(d, meta)
@@ -258,7 +252,7 @@ func resourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 		d.Set("legacy_credentials", true)
 	}
 
-	err = setCloudantEmitDataEventTypes(client, d)
+	err = setCloudantIncludeDataEventTypes(client, d)
 	if err != nil {
 		return err
 	}
@@ -288,8 +282,8 @@ func resourceIBMCloudantUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if d.HasChange("emit_data_event_types") {
-		err := updateCloudantEmitDataEventTypes(client, d)
+	if d.HasChange("include_data_events") {
+		err := updateCloudantIncludeDataEventTypes(client, d)
 		if err != nil {
 			return fmt.Errorf("Error updating activity tracker events: %s", err)
 		}
@@ -395,13 +389,13 @@ func setCloudantInstanceAuditEventTypes(client *cloudantv1.CloudantV1, d *schema
 	return nil
 }
 
-func setCloudantEmitDataEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+func setCloudantIncludeDataEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	activityTrackerEvents, err := readCloudantInstanceAuditEventTypes(client)
 	if err != nil {
 		return fmt.Errorf("Error retrieving activity tracker events: %s", err)
 	}
 	if activityTrackerEvents.Types != nil {
-		d.Set("emit_data_event_types", len(activityTrackerEvents.Types) == 2)
+		d.Set("include_data_events", len(activityTrackerEvents.Types) == 2)
 	}
 	return nil
 }
@@ -416,10 +410,10 @@ func readCloudantInstanceAuditEventTypes(client *cloudantv1.CloudantV1) (*clouda
 	return activityTrackerEvents, err
 }
 
-func updateCloudantEmitDataEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+func updateCloudantIncludeDataEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	var auditEventTypes []string
-	emitDataEventTypes := d.Get("emit_data_event_types").(bool)
-	if emitDataEventTypes {
+	includeDataEventTypes := d.Get("include_data_events").(bool)
+	if includeDataEventTypes {
 		auditEventTypes = []string{"management", "data"}
 	} else {
 		auditEventTypes = []string{"management"}
@@ -459,6 +453,11 @@ func setCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Resour
 }
 
 func setCloudantInstanceCapacityBlocks(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+	if d.Get("plan").(string) == "lite" {
+		d.Set("capacity", 1)
+		return nil
+	}
+
 	capacityThroughputInformation, err := readCloudantInstanceCapacity(client)
 	if err != nil {
 		return fmt.Errorf("Error retrieving capacity throughput information: %s", err)
@@ -570,9 +569,13 @@ func readCloudantInstanceCors(client *cloudantv1.CloudantV1) (*cloudantv1.CorsIn
 
 func updateCloudantInstanceCors(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	enableCors := d.Get("enable_cors").(bool)
-	corsConfig := d.Get("cors_config").([]interface{})[0].(map[string]interface{})
-	allowCredentials := corsConfig["allow_credentials"].(bool)
-	origins := expandStringList(corsConfig["origins"].([]interface{}))
+	allowCredentials := false
+	origins := make([]string, 0)
+	if enableCors {
+		corsConfig := d.Get("cors_config").([]interface{})[0].(map[string]interface{})
+		allowCredentials = corsConfig["allow_credentials"].(bool)
+		origins = expandStringList(corsConfig["origins"].([]interface{}))
+	}
 
 	opts := client.NewPutCorsConfigurationOptions(origins)
 	opts.SetEnableCors(enableCors)
