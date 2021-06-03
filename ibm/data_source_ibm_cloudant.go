@@ -40,72 +40,52 @@ func dataSourceIBMCloudant() *schema.Resource {
 		},
 	}
 
-	riSchema["audit_event_types"] = &schema.Schema{
-		Description: "An array of event types that are being sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. \"management\" is a required element of this array.",
-		Type:        schema.TypeList,
+	riSchema["include_data_events"] = &schema.Schema{
+		Description: "Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of \"management\" type.",
+		Type:        schema.TypeBool,
 		Computed:    true,
-		Elem:        &schema.Schema{Type: schema.TypeString},
 	}
 
 	riSchema["capacity"] = &schema.Schema{
-		Description: "Detailed information about provisioned throughput capacity.",
-		Type:        schema.TypeList,
+		Description: "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.",
+		Type:        schema.TypeInt,
 		Computed:    true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"throughput": &schema.Schema{
-					Type:        schema.TypeList,
-					Computed:    true,
-					Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"blocks": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.",
-							},
-							"query": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "Provisioned global queries capacity in operations per second.",
-							},
-							"read": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "Provisioned reads capacity in operations per second.",
-							},
-							"write": {
-								Type:        schema.TypeInt,
-								Computed:    true,
-								Description: "Provisioned writes capacity in operations per second.",
-							},
-						},
-					},
-				},
-			},
-		},
 	}
 
-	riSchema["cors"] = &schema.Schema{
-		Description: "Detailed information about CORS configuration.",
+	riSchema["throughput"] = &schema.Schema{
+		Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
+		Type:        schema.TypeMap,
+		Elem: &schema.Schema{
+			Type: schema.TypeInt,
+		},
+		Computed: true,
+	}
+
+	riSchema["enable_cors"] = &schema.Schema{
+		Description: "Boolean value to turn CORS on and off.",
+		Type:        schema.TypeBool,
+		Default:     false,
+		Optional:    true,
+	}
+
+	riSchema["cors_config"] = &schema.Schema{
+		Description: "Configuration for CORS.",
 		Type:        schema.TypeList,
-		Computed:    true,
+		Optional:    true,
+		MinItems:    1,
+		MaxItems:    1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"allow_credentials": {
-					Type:        schema.TypeBool,
-					Computed:    true,
+				"allow_credentials": &schema.Schema{
 					Description: "Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.",
-				},
-				"enable_cors": {
 					Type:        schema.TypeBool,
-					Computed:    true,
-					Description: "Boolean value to turn CORS on and off.",
+					Default:     true,
+					Optional:    true,
 				},
-				"origins": {
-					Type:        schema.TypeList,
-					Computed:    true,
+				"origins": &schema.Schema{
 					Description: "An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.",
+					Type:        schema.TypeList,
+					Required:    true,
 					Elem: &schema.Schema{
 						Type: schema.TypeString,
 					},
@@ -141,7 +121,7 @@ func dataSourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	err = setCloudantInstanceAuditEventTypes(client, d)
+	err = setCloudantActivityTrackerEvents(client, d)
 	if err != nil {
 		return err
 	}

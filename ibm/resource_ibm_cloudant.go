@@ -218,7 +218,7 @@ func resourceIBMCloudantCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.Get("include_data_events").(bool) {
-		err := updateCloudantIncludeDataEventTypes(client, d)
+		err := updateCloudantActivityTrackerEvents(client, d)
 		if err != nil {
 			return fmt.Errorf("Error updating activity tracker events: %s", err)
 		}
@@ -261,17 +261,17 @@ func resourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 		d.Set("legacy_credentials", true)
 	}
 
-	err = setCloudantIncludeDataEventTypes(client, d)
+	err = setCloudantActivityTrackerEvents(client, d)
 	if err != nil {
 		return err
 	}
 
-	err = setCloudantInstanceCapacityThroughput(client, d)
+	err = setCloudantInstanceCapacity(client, d)
 	if err != nil {
 		return err
 	}
 
-	err = setCloudantInstanceCorsAttributes(client, d)
+	err = setCloudantInstanceCors(client, d)
 	if err != nil {
 		return err
 	}
@@ -292,7 +292,7 @@ func resourceIBMCloudantUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("include_data_events") {
-		err := updateCloudantIncludeDataEventTypes(client, d)
+		err := updateCloudantActivityTrackerEvents(client, d)
 		if err != nil {
 			return fmt.Errorf("Error updating activity tracker events: %s", err)
 		}
@@ -387,19 +387,8 @@ func readCloudantServerInformation(client *cloudantv1.CloudantV1) (*cloudantv1.S
 	return serverInformation, err
 }
 
-func setCloudantInstanceAuditEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
-	activityTrackerEvents, err := readCloudantInstanceAuditEventTypes(client)
-	if err != nil {
-		return fmt.Errorf("Error retrieving activity tracker events: %s", err)
-	}
-	if activityTrackerEvents.Types != nil {
-		d.Set("audit_event_types", activityTrackerEvents.Types)
-	}
-	return nil
-}
-
-func setCloudantIncludeDataEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
-	activityTrackerEvents, err := readCloudantInstanceAuditEventTypes(client)
+func setCloudantActivityTrackerEvents(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+	activityTrackerEvents, err := readCloudantActivityTrackerEvents(client)
 	if err != nil {
 		return fmt.Errorf("Error retrieving activity tracker events: %s", err)
 	}
@@ -409,7 +398,7 @@ func setCloudantIncludeDataEventTypes(client *cloudantv1.CloudantV1, d *schema.R
 	return nil
 }
 
-func readCloudantInstanceAuditEventTypes(client *cloudantv1.CloudantV1) (*cloudantv1.ActivityTrackerEvents, error) {
+func readCloudantActivityTrackerEvents(client *cloudantv1.CloudantV1) (*cloudantv1.ActivityTrackerEvents, error) {
 	opts := client.NewGetActivityTrackerEventsOptions()
 
 	activityTrackerEvents, response, err := client.GetActivityTrackerEvents(opts)
@@ -419,7 +408,7 @@ func readCloudantInstanceAuditEventTypes(client *cloudantv1.CloudantV1) (*clouda
 	return activityTrackerEvents, err
 }
 
-func updateCloudantIncludeDataEventTypes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+func updateCloudantActivityTrackerEvents(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	var auditEventTypes []string
 	includeDataEventTypes := d.Get("include_data_events").(bool)
 	if includeDataEventTypes {
@@ -438,30 +427,6 @@ func updateCloudantIncludeDataEventTypes(client *cloudantv1.CloudantV1, d *schem
 }
 
 func setCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
-	capacityThroughputInformation, err := readCloudantInstanceCapacity(client)
-	if err != nil {
-		return fmt.Errorf("Error retrieving capacity throughput information: %s", err)
-	}
-	if capacityThroughputInformation.Current != nil && capacityThroughputInformation.Current.Throughput != nil {
-		throughput := capacityThroughputInformation.Current.Throughput
-		capacity := []map[string]interface{}{
-			map[string]interface{}{
-				"throughput": []map[string]interface{}{
-					map[string]interface{}{
-						"blocks": throughput.Blocks,
-						"query":  throughput.Query,
-						"read":   throughput.Read,
-						"write":  throughput.Write,
-					},
-				},
-			},
-		}
-		d.Set("capacity", capacity)
-	}
-	return nil
-}
-
-func setCloudantInstanceCapacityThroughput(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	if d.Get("plan").(string) == "lite" {
 		d.Set("capacity", 1)
 		return nil
@@ -534,24 +499,6 @@ func updateCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Res
 }
 
 func setCloudantInstanceCors(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
-	corsInformation, err := readCloudantInstanceCors(client)
-	if err != nil {
-		return fmt.Errorf("Error retrieving CORS config: %s", err)
-	}
-	if corsInformation != nil {
-		cors := []map[string]interface{}{
-			map[string]interface{}{
-				"allow_credentials": corsInformation.AllowCredentials,
-				"enable_cors":       corsInformation.EnableCors,
-				"origins":           corsInformation.Origins,
-			},
-		}
-		d.Set("cors", cors)
-	}
-	return nil
-}
-
-func setCloudantInstanceCorsAttributes(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	corsInformation, err := readCloudantInstanceCors(client)
 	if err != nil {
 		return fmt.Errorf("Error retrieving CORS config: %s", err)
