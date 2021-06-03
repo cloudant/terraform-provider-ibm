@@ -86,6 +86,15 @@ func resourceIBMCloudant() *schema.Resource {
 		ValidateFunc: validation.IntAtLeast(1),
 	}
 
+	riSchema["throughput"] = &schema.Schema{
+		Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
+		Type:        schema.TypeMap,
+		Elem: &schema.Schema{
+			Type: schema.TypeInt,
+		},
+		Computed: true,
+	}
+
 	riSchema["enable_cors"] = &schema.Schema{
 		Description: "Boolean value to turn CORS on and off.",
 		Type:        schema.TypeBool,
@@ -257,7 +266,7 @@ func resourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	err = setCloudantInstanceCapacityBlocks(client, d)
+	err = setCloudantInstanceCapacityThroughput(client, d)
 	if err != nil {
 		return err
 	}
@@ -452,7 +461,7 @@ func setCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Resour
 	return nil
 }
 
-func setCloudantInstanceCapacityBlocks(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
+func setCloudantInstanceCapacityThroughput(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	if d.Get("plan").(string) == "lite" {
 		d.Set("capacity", 1)
 		return nil
@@ -463,9 +472,15 @@ func setCloudantInstanceCapacityBlocks(client *cloudantv1.CloudantV1, d *schema.
 		return fmt.Errorf("Error retrieving capacity throughput information: %s", err)
 	}
 	if capacityThroughputInformation.Current != nil && capacityThroughputInformation.Current.Throughput != nil {
-		throughput := capacityThroughputInformation.Current.Throughput
-		blocks := int(*throughput.Blocks)
+		currentThroughput := capacityThroughputInformation.Current.Throughput
+		blocks := int(*currentThroughput.Blocks)
+		throughput := map[string]int{
+			"query": int(*currentThroughput.Query),
+			"read":  int(*currentThroughput.Read),
+			"write": int(*currentThroughput.Write),
+		}
 		d.Set("capacity", blocks)
+		d.Set("throughput", throughput)
 	}
 	return nil
 }
