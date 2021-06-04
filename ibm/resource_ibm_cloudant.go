@@ -23,8 +23,8 @@ func resourceIBMCloudant() *schema.Resource {
 	riSchema := resourceIBMResourceInstance().Schema
 
 	riSchema["service"] = &schema.Schema{
-		Description: "The service type of the instance",
 		Type:        schema.TypeString,
+		Description: "The service type of the instance",
 		Computed:    true,
 	}
 
@@ -38,15 +38,15 @@ func resourceIBMCloudant() *schema.Resource {
 	riSchema["environment_crn"] = &schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
-		ForceNew:    true,
 		Description: "CRN of the IBM Cloudant Dedicated Hardware plan instance",
+		ForceNew:    true,
 	}
 
 	riSchema["cluster_location"] = &schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
-		ForceNew:    true,
 		Description: "The actual physical location of the Dedicated Hardware plan instance",
+		ForceNew:    true,
 	}
 
 	riSchema["hipaa"] = &schema.Schema{
@@ -58,74 +58,74 @@ func resourceIBMCloudant() *schema.Resource {
 	riSchema["kms_instance_crn"] = &schema.Schema{
 		Type:         schema.TypeString,
 		Optional:     true,
+		Description:  "CRN of the Key Protect instance housing the encryption key for BYOK",
 		ForceNew:     true,
 		RequiredWith: []string{"kms_key_crn"},
-		Description:  "CRN of the Key Protect instance housing the encryption key for BYOK",
 	}
 
 	riSchema["kms_key_crn"] = &schema.Schema{
 		Type:         schema.TypeString,
 		Optional:     true,
+		Description:  "CRN of the encryption key that is stored in the Key Protect instance",
 		ForceNew:     true,
 		RequiredWith: []string{"kms_instance_crn"},
-		Description:  "CRN of the encryption key that is stored in the Key Protect instance",
 	}
 
 	riSchema["include_data_events"] = &schema.Schema{
-		Description: "Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of \"management\" type.",
 		Type:        schema.TypeBool,
 		Optional:    true,
 		Default:     false,
+		Description: "Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of \"management\" type.",
 	}
 
 	riSchema["capacity"] = &schema.Schema{
-		Description:  "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.",
 		Type:         schema.TypeInt,
 		Optional:     true,
 		Default:      1,
+		Description:  "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.",
 		ValidateFunc: validation.IntAtLeast(1),
 	}
 
 	riSchema["throughput"] = &schema.Schema{
-		Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
 		Type:        schema.TypeMap,
+		Computed:    true,
+		Description: "Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.",
 		Elem: &schema.Schema{
 			Type: schema.TypeInt,
 		},
-		Computed: true,
 	}
 
 	riSchema["enable_cors"] = &schema.Schema{
-		Description: "Boolean value to turn CORS on and off.",
 		Type:        schema.TypeBool,
-		Default:     false,
 		Optional:    true,
+		Default:     false,
+		Description: "Boolean value to turn CORS on and off.",
 	}
 
 	riSchema["cors_config"] = &schema.Schema{
-		Description: "Configuration for CORS.",
 		Type:        schema.TypeList,
 		Optional:    true,
-		MinItems:    1,
-		MaxItems:    1,
+		Description: "Configuration for CORS.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"allow_credentials": &schema.Schema{
-					Description: "Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.",
 					Type:        schema.TypeBool,
-					Default:     true,
 					Optional:    true,
+					Default:     true,
+					Description: "Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.",
 				},
 				"origins": &schema.Schema{
-					Description: "An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.",
 					Type:        schema.TypeList,
 					Required:    true,
+					Description: "An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.",
 					Elem: &schema.Schema{
 						Type: schema.TypeString,
 					},
 				},
 			},
 		},
+		MinItems: 1,
+		MaxItems: 1,
 	}
 
 	return &schema.Resource{
