@@ -105,15 +105,19 @@ func resourceIBMCloudant() *schema.Resource {
 	}
 
 	riSchema["cors_config"] = &schema.Schema{
-		Type:        schema.TypeList,
-		Optional:    true,
+		Type:     schema.TypeList,
+		Optional: true,
+		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+			// suppress missing cors_config, we set defaults during update
+			return k == "cors_config.#" && new == "0"
+		},
 		Description: "Configuration for CORS.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"allow_credentials": &schema.Schema{
 					Type:        schema.TypeBool,
 					Optional:    true,
-					Default:     false,
+					Default:     true,
 					Description: "Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.",
 				},
 				"origins": &schema.Schema{
@@ -263,10 +267,10 @@ func resourceIBMCloudantRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	// if resource was imported, set missing legacy_credentials to default true
-	// since we don't have this value exposed on the broker
+	// if resource was imported, set missing legacy_credentials
+	// to default false since we don't have this value exposed on the broker
 	if _, ok := d.GetOkExists("legacy_credentials"); !ok {
-		d.Set("legacy_credentials", true)
+		d.Set("legacy_credentials", false)
 	}
 
 	err = setCloudantActivityTrackerEvents(client, d)
@@ -453,24 +457,25 @@ func validateCloudantInstanceCapacity(d *schema.ResourceData) error {
 }
 
 func setCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
-	if d.Get("plan").(string) == "lite" {
-		d.Set("capacity", 1)
-		return nil
-	}
-
 	capacityThroughputInformation, err := readCloudantInstanceCapacity(client)
 	if err != nil {
 		return fmt.Errorf("Error retrieving capacity throughput information: %s", err)
 	}
+
 	if capacityThroughputInformation.Current != nil && capacityThroughputInformation.Current.Throughput != nil {
 		currentThroughput := capacityThroughputInformation.Current.Throughput
-		blocks := int(*currentThroughput.Blocks)
+		// lite plan doesn't have "blocks" attr on broker's response
+		if d.Get("plan").(string) == "lite" {
+			d.Set("capacity", 1)
+		} else {
+			blocks := int(*currentThroughput.Blocks)
+			d.Set("capacity", blocks)
+		}
 		throughput := map[string]int{
 			"query": int(*currentThroughput.Query),
 			"read":  int(*currentThroughput.Read),
 			"write": int(*currentThroughput.Write),
 		}
-		d.Set("capacity", blocks)
 		d.Set("throughput", throughput)
 	}
 	return nil
@@ -566,7 +571,7 @@ func readCloudantInstanceCors(client *cloudantv1.CloudantV1) (*cloudantv1.CorsIn
 
 func updateCloudantInstanceCors(client *cloudantv1.CloudantV1, d *schema.ResourceData) error {
 	enableCors := d.Get("enable_cors").(bool)
-	allowCredentials := false
+	allowCredentials := true
 	origins := make([]string, 0)
 	corsConfigRaw := d.Get("cors_config").([]interface{})
 	if enableCors && len(corsConfigRaw) > 0 {
