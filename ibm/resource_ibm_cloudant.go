@@ -503,7 +503,7 @@ func updateCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Res
 	target := *capacityThroughputInformation.Target.Throughput.Blocks
 
 	for current != target {
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(time.Second)
 
 		capacityThroughputInformation, response, err = client.GetCapacityThroughputInformation(getOpts)
 		if err != nil {
@@ -515,8 +515,8 @@ func updateCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Res
 		target = *capacityThroughputInformation.Target.Throughput.Blocks
 		retryCount++
 
-		// wait up to 5 sec for capacity to sync up with target
-		if retryCount > 25 {
+		// wait up to 30 secs for capacity to sync up with target
+		if retryCount > 30 {
 			return fmt.Errorf("Retry count exceeded")
 		}
 	}
