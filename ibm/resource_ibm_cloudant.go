@@ -520,8 +520,8 @@ func updateCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Res
 		target = *capacityThroughputInformation.Target.Throughput.Blocks
 		retryCount++
 
-		// wait up to 30 secs for capacity to sync up with target
-		if retryCount > 30 {
+		// wait up to a 2 minutes for capacity to sync up with target
+		if retryCount > 120 {
 			return fmt.Errorf("Retry count exceeded")
 		}
 	}
@@ -531,9 +531,14 @@ func updateCloudantInstanceCapacity(client *cloudantv1.CloudantV1, d *schema.Res
 
 func validateCloudantInstanceCors(d *schema.ResourceData) error {
 	enableCors := d.Get("enable_cors").(bool)
-	corsConfig := d.Get("cors_config").([]interface{})
-	if !enableCors && len(corsConfig) > 0 {
-		return fmt.Errorf("Setting \"cors_config\" conflicts with enable_cors set to false")
+	corsConfigRaw := d.Get("cors_config").([]interface{})
+	if !enableCors && len(corsConfigRaw) > 0 {
+		corsConfig := corsConfigRaw[0].(map[string]interface{})
+		allowCredentials := corsConfig["allow_credentials"].(bool)
+		origins := corsConfig["origins"].([]interface{})
+		if !allowCredentials || len(origins) > 0 {
+			return fmt.Errorf("Setting \"cors_config\" conflicts with enable_cors set to false")
+		}
 	}
 	return nil
 }
