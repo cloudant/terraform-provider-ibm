@@ -54,11 +54,12 @@ The following arguments are supported:
 * `location` - (Required, Forces new resource, String) Target location or environment to create the resource instance.
 * `plan` - (Required, String) The plan type of the service.
 * `capacity` - (Optional, Number) A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.
+    * Constraints: The default value is `1`.
 * `cluster_location` - (Optional, String) The actual physical location of the Dedicated Hardware plan instance.
 * `cors_config` - (Optional, Block List) Configuration for CORS. (see [below for nested arguments](#nestedblock--cors_config))
   * Constraints: The minimum length is `1` item.
 * `enable_cors` - (Optional, Boolean) Boolean value to turn CORS on and off.
-  * Constraints: The default value is `false`.
+  * Constraints: The default value is `true`.
 * `environment_crn` - (Optional, String) CRN of the IBM Cloudant Dedicated Hardware plan instance.
 * `hipaa` - (Optional, Boolean) Instance is HIPAA ready in US locations.
   * Constraints: The default value is `false`.
@@ -78,7 +79,7 @@ The following arguments are supported:
 
 * `origins` - (Required, List of String) An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.
 * `allow_credentials` - (Optional, Boolean) Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.
-  * Constraints: The default value is `false`.
+  * Constraints: The default value is `true`.
 
 ## Attribute Reference
 
