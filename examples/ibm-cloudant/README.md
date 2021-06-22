@@ -4,9 +4,7 @@ This example illustrates how to use the CloudantV1
 
 These types of resources are supported:
 
-* cloudant_activity_tracker_events
-* cloudant_capacity_throughput
-* cloudant_cors
+* cloudant
 
 ## Usage
 
@@ -23,54 +21,42 @@ Run `terraform destroy` when you don't need these resources.
 
 ## CloudantV1 resources
 
-cloudant_activity_tracker_events resource:
+cloudant resource:
 
 ```hcl
-resource "ibm_cloudant_activity_tracker_events" "cloudant_activity_tracker_events_instance" {
-  types = var.cloudant_activity_tracker_events_types
-}
-```
-cloudant_capacity_throughput resource:
+resource "ibm_cloudant" "cloudant" {
+  // Required arguments:
+  name     = var.service_name
+  location = var.service_location
+  plan     = var.service_plan
 
-```hcl
-resource "ibm_cloudant_capacity_throughput" "cloudant_capacity_throughput_instance" {
-  blocks = var.cloudant_capacity_throughput_blocks
-}
-```
-cloudant_cors resource:
+  // Optional arguments:
+  capacity = var.cloudant_capacity_throughput_blocks
 
-```hcl
-resource "ibm_cloudant_cors" "cloudant_cors_instance" {
-  origins = var.cloudant_cors_config_origins
-  allow_credentials = var.cloudant_cors_config_allow_credentials
   enable_cors = var.cloudant_enable_cors
+  cors_config {
+    allow_credentials = var.cloudant_cors_config_allow_credentials
+    origins           = var.cloudant_cors_config_origins
+  }
+
+  legacy_credentials = var.cloudant_legacy_credentials
+  include_data_events = var.cloudant_include_data_events
+
+  timeouts {
+    create = var.cloudant_timeout
+    update = var.cloudant_timeout
+    delete = var.cloudant_timeout
+  }
 }
 ```
 
 ## CloudantV1 Data sources
 
-cloudant_server_information data source:
+cloudant data source:
 
 ```hcl
-data "ibm_cloudant_server_information" "cloudant_server_information_instance" {
-}
-```
-cloudant_activity_tracker_events data source:
-
-```hcl
-data "ibm_cloudant_activity_tracker_events" "cloudant_activity_tracker_events_instance" {
-}
-```
-cloudant_capacity_throughput data source:
-
-```hcl
-data "ibm_cloudant_capacity_throughput" "cloudant_capacity_throughput_instance" {
-}
-```
-cloudant_cors data source:
-
-```hcl
-data "ibm_cloudant_cors" "cloudant_cors_instance" {
+data "ibm_cloudant" "cloudant" {
+  name     = ibm_cloudant.cloudant.name
 }
 ```
 
@@ -125,7 +111,4 @@ data "ibm_cloudant_cors" "cloudant_cors_instance" {
 
 | Name | Description |
 |------|-------------|
-| cloudant_activity_tracker_events | cloudant_activity_tracker_events object |
-| cloudant_capacity_throughput | cloudant_capacity_throughput object |
-| cloudant_cors | cloudant_cors object |
-| cloudant_server_information | cloudant_server_information object |
+| cloudant | cloudant object |
