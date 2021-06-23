@@ -39,6 +39,8 @@ In addition to all arguments above, the following attributes are exported:
 
 * `capacity` (Number) A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.
 * `cors_config` (List of Object) Configuration for CORS. (see [below for nested attributes](#nestedatt--cors_config))
+    * `allow_credentials` (Boolean) - Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.
+    * `origins` (List of String) - Contains the list of allowed origin domains with the full URL including the protocol. Subdomains count as separate domains, so all subdomains used have to be listed.
 * `crn` (String) CRN of resource instance.
 * `enable_cors` (Boolean) Boolean value to turn CORS on and off.
 * `extensions` (Map of String) The extended metadata as a map associated with the resource instance.
@@ -57,9 +59,3 @@ In addition to all arguments above, the following attributes are exported:
 * `status` (String) The resource instance status.
 * `throughput` (Map of Number) Schema for detailed information about throughput capacity with breakdown by specific throughput requests classes.
 * `version` (String) Vendor version.
-
-<a id="nestedatt--cors_config"></a>
-### Nested Attributes for `cors_config`
-
-* `allow_credentials` (Boolean) - Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.
-* `origins` (List of String) - Contains the list of allowed origin domains with the full URL including the protocol. Subdomains count as separate domains, so all subdomains used have to be listed.
