@@ -42,9 +42,9 @@ resource "ibm_cloudant" "cloudant" {
 ibm_cloudant provides the following [Timeouts](https://www.terraform.io/docs/language/resources/syntax.html#operation-timeouts) 
 configuration options:
 
-* `create` - The creation of the IBM Cloudant instance is considered failed if no response received for 10 minutes.
-* `delete` - The update of the IBM Cloudant instance is considered failed if no response received for 10 minutes.
-* `update` - The deletion of the IBM Cloudant instance is considered failed if no response received for 10 minutes.
+* `create` - (Default 10 minutes) The creation of the IBM Cloudant instance is considered failed if no response received.
+* `delete` - (Default 10 minutes) The update of the IBM Cloudant instance is considered failed if no response received.
+* `update` - (Default 10 minutes) The deletion of the IBM Cloudant instance is considered failed if no response received.
 
 ## Argument Reference
 
