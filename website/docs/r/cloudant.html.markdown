@@ -142,5 +142,5 @@ $ terraform import ibm_cloudant.mycloudant <crn>
 
 ### Example
 ```hcl
-$ terraform import ibm_cloudant.mycloudant "crn:v1:bluemix:public:cloudantnosqldb:us-south:a/30445dfab3374bb9a2537cc60919a307:8b828ce9-483e-4196-8c84-e129b10685c8::"
+$ terraform import ibm_cloudant.mycloudant "crn:v1:bluemix:public:cloudantnosqldb:us-south:a/4ea2849a2d3401ed1e457268541966ea:79262bd4-4067-4783-b5ce-b1dba84ff8c4::"
 ```
