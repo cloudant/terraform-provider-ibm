@@ -55,22 +55,22 @@ The following arguments are supported:
 * `plan` - (Required, String) The plan type of the service.
 * `capacity` - (Optional, Number) A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.
     * Constraints: The default value is `1`.
-* `cluster_location` - (Optional, String) The actual physical location of the Dedicated Hardware plan instance.
+* `cluster_location` - (Optional, Forces new resource, String) The actual physical location of the Dedicated Hardware plan instance.
 * `cors_config` - (Optional, Block List) Configuration for CORS. (see [below for nested arguments](#nestedblock--cors_config))
   * Constraints: The minimum length is `1` item.
 * `enable_cors` - (Optional, Boolean) Boolean value to turn CORS on and off.
   * Constraints: The default value is `true`.
-* `environment_crn` - (Optional, String) CRN of the IBM Cloudant Dedicated Hardware plan instance.
-* `hipaa` - (Optional, Boolean) Instance is HIPAA ready in US locations.
+* `environment_crn` - (Optional, Forces new resource, String) CRN of the IBM Cloudant Dedicated Hardware plan instance.
+* `hipaa` - (Optional, Forces new resource, Boolean) Instance is HIPAA ready in US locations.
   * Constraints: The default value is `false`.
 * `include_data_events` - (Optional, Boolean) Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of "management" type.
   * Constraints: The default value is `false`.
-* `kms_instance_crn` - (Optional, String) CRN of the Key Protect instance housing the encryption key for BYOK.
-* `kms_key_crn` - (Optional, String) CRN of the encryption key that is stored in the Key Protect instance.
-* `legacy_credentials` - (Optional, Boolean) Use both legacy credentials and IAM for authentication.
+* `kms_instance_crn` - (Optional, Forces new resource, String) CRN of the Key Protect instance housing the encryption key for BYOK.
+* `kms_key_crn` - (Optional, Forces new resource, String) CRN of the encryption key that is stored in the Key Protect instance.
+* `legacy_credentials` - (Optional, Forces new resource, Boolean) Use both legacy credentials and IAM for authentication.
   * Constraints: The default value is `false`.
-* `parameters` - (Optional, Map) Arbitrary parameters to pass. Must be a JSON object.
-* `resource_group_id` - (Optional, String) The resource group id.
+* `parameters` - (Optional, Forces new resource, Map) Arbitrary parameters to pass. Must be a JSON object.
+* `resource_group_id` - (Optional, Forces new resource, String) The resource group id.
 * `service_endpoints` - (Optional, String) Types of the service endpoints. Possible values are 'public', 'private', 'public-and-private'.
 * `tags` - (Optional, Set of String) Tags associated with the instance.
 
