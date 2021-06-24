@@ -6,9 +6,9 @@ description: |-
 subcategory: "Cloudant"
 ---
 
-# ibm\_cloudant_activity_tracker_events
+# ibm_cloudant
 
-Provides a read-only data source for ibm_cloudant. You can then reference the fields of the data source in other resources within the same configuration using interpolation syntax.
+Provides a read-only data source for an existing IBM Cloud Cloudant service. You can then reference the fields of the data source in other resources within the same configuration using interpolation syntax.
 
 ## Example Usage
 
