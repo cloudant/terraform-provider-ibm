@@ -41,7 +41,7 @@ variable "cloudant_activity_tracker_events_types" {
 variable "cloudant_capacity_throughput_blocks" {
   description = "A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity."
   type        = number
-  default     = 0
+  default     = 1
 }
 
 // Resource arguments for cloudant_cluster_information
