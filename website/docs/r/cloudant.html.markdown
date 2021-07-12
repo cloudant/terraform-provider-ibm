@@ -50,8 +50,8 @@ configuration options:
 
 The following arguments are supported:
 
-* `name` - (Required, String) A name for the resource instance.
 * `location` - (Required, Forces new resource, String) Target location or environment to create the resource instance.
+* `name` - (Required, String) A name for the resource instance.
 * `plan` - (Required, String) The plan type of the service.
 * `capacity` - (Optional, Number) A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.
   * Constraints: The default value is `1`. Setting capacity is not supported for lite plan.
@@ -63,6 +63,7 @@ The following arguments are supported:
 * `enable_cors` - (Optional, Boolean) Boolean value to turn CORS on and off.
   * Constraints: The default value is `true`.If it is set to `false`, then customizing `cors_config` is not allowed.
 * `environment_crn` - (Optional, Forces new resource, String) CRN of the IBM Cloudant Dedicated Hardware plan instance.
+* `id` - (Optional, String) The unique identifier of the new Cloudant resource.
 * `include_data_events` - (Optional, Boolean) Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of "management" type.
   * Constraints: The default value is `false`.
 * `legacy_credentials` - (Optional, Forces new resource, Boolean) Use both legacy credentials and IAM for authentication.
@@ -86,7 +87,6 @@ In addition to all arguments above, you can access the following attribute refer
 * `deleted_by` - (String) The subject who deleted the instance.
 * `extensions` - (Map) The extended metadata as a map associated with the resource instance.
 * `guid` - (String) Guid of resource instance.
-* `id` - (Optional, String) The unique identifier of the new Cloudant resource.
 * `last_operation` - (Map) The status of the last operation requested on the instance.
 * `locked` - (Boolean) A boolean that dictates if the resource instance should be deleted (cleaned up) during the processing of a region instance delete call.
 * `plan_history` - (List of Object) The plan history of the instance.

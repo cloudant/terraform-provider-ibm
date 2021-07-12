@@ -30,6 +30,7 @@ resource "ibm_resource_instance" "cloudant" {
 The following arguments are supported:
 
 * `name` (Required, String) The name of the IBM Cloudant resource instance.
+* `id` (Optional, String) The unique identifier of the Cloudant resource.
 * `location` (Optional, String) The location or the environment in which instance exists.
 * `resource_group_id` (Optional, String) The id of the resource group in which the instance is present. If not provided it takes the default resource group.
 
@@ -47,7 +48,6 @@ In addition to all arguments above, the following attributes are exported:
 * `features` (List of String) List of enabled optional features.
 * `features_flags` (List of String) List of feature flags.
 * `guid` (String) Guid of resource instance.
-* `id` (Optional, String) The ID of this resource.
 * `include_data_events` (Boolean) Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of "management" type.
 * `plan` (String) The plan type of the instance.
 * `resource_controller_url` (String) The URL of the IBM Cloud dashboard that can be used to explore and view details about the resource.
