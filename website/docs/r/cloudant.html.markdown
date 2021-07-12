@@ -55,7 +55,6 @@ The following arguments are supported:
 * `plan` - (Required, String) The plan type of the service.
 * `capacity` - (Optional, Number) A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.
   * Constraints: The default value is `1`. Setting capacity is not supported for lite plan.
-* `cluster_location` - (Optional, Forces new resource, String) The actual physical location of the Dedicated Hardware plan instance.
 * `cors_config` - (Optional, Block List) Configuration for CORS. (see [below for nested arguments](#nestedblock--cors_config)) 
   * Constraints: The minimum length is `1` item. Can conflict with `enable_cors` if it is set to `false`. In this case the CORS customization is not allowed.
   * `origins` - (Required, List of String) An array of strings that contain allowed origin domains. You have to specify the full URL including the protocol. It is recommended that only the HTTPS protocol is used. Subdomains count as separate domains, so you have to specify all subdomains used.
@@ -64,12 +63,8 @@ The following arguments are supported:
 * `enable_cors` - (Optional, Boolean) Boolean value to turn CORS on and off.
   * Constraints: The default value is `true`.If it is set to `false`, then customizing `cors_config` is not allowed.
 * `environment_crn` - (Optional, Forces new resource, String) CRN of the IBM Cloudant Dedicated Hardware plan instance.
-* `hipaa` - (Optional, Forces new resource, Boolean) Instance is HIPAA ready in US locations.
-  * Constraints: The default value is `false`.
 * `include_data_events` - (Optional, Boolean) Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of "management" type.
   * Constraints: The default value is `false`.
-* `kms_instance_crn` - (Optional, Forces new resource, String) CRN of the Key Protect instance housing the encryption key for BYOK.
-* `kms_key_crn` - (Optional, Forces new resource, String) CRN of the encryption key that is stored in the Key Protect instance.
 * `legacy_credentials` - (Optional, Forces new resource, Boolean) Use both legacy credentials and IAM for authentication.
   * Constraints: The default value is `false`.
 * `parameters` - (Optional, Forces new resource, Map) Arbitrary parameters to pass. Must be a JSON object.
