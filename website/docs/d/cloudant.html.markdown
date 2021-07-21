@@ -3,7 +3,7 @@ layout: "ibm"
 page_title: "IBM : ibm_cloudant"
 description: |-
   Get information about Cloudant instance.
-subcategory: "Cloudant"
+subcategory: "Cloud Databases"
 ---
 
 # ibm_cloudant
@@ -38,7 +38,7 @@ The following arguments are supported:
 
 In addition to all arguments above, the following attributes are exported:
 
-* `capacity` (Number) A number of blocks of throughput units. A block consists of 100 reads/sec, 50 writes/sec, and 5 global queries/sec of provisioned throughput capacity.
+* `capacity` (Number) A number of blocks of throughput units. For more details please read about [`blocks`](https://cloud.ibm.com/apidocs/cloudant#putcapacitythroughputconfiguration) parameter.
 * `cors_config` (List of Object) Configuration for CORS. (see [below for nested attributes](#nestedatt--cors_config))
     * `allow_credentials` (Boolean) - Boolean value to allow authentication credentials. If set to true, browser requests must be done by using withCredentials = true.
     * `origins` (List of String) - Contains the list of allowed origin domains with the full URL including the protocol. Subdomains count as separate domains, so all subdomains used have to be listed.
@@ -48,7 +48,7 @@ In addition to all arguments above, the following attributes are exported:
 * `features` (List of String) List of enabled optional features.
 * `features_flags` (List of String) List of feature flags.
 * `guid` (String) Guid of resource instance.
-* `include_data_events` (Boolean) Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of "management" type.
+* `include_data_events` (Boolean) Include `data` event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default emitted events are only of `management` type.
 * `plan` (String) The plan type of the instance.
 * `resource_controller_url` (String) The URL of the IBM Cloud dashboard that can be used to explore and view details about the resource.
 * `resource_crn` (String) The crn of the resource.
