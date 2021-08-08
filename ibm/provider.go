@@ -527,6 +527,10 @@ func Provider() *schema.Provider {
 			"ibm_en_topics":        dataSourceIBMEnTopics(),
 			"ibm_en_subscription":  dataSourceIBMEnSubscription(),
 			"ibm_en_subscriptions": dataSourceIBMEnSubscriptions(),
+
+			//Cloudant database resources
+			"ibm_cloudant_database":    dataSourceIbmCloudantDatabase(),
+			"ibm_cloudant_replication": dataSourceIbmCloudantReplication(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -848,6 +852,10 @@ func Provider() *schema.Provider {
 			"ibm_en_destination":  resourceIBMEnDestination(),
 			"ibm_en_topic":        resourceIBMEnTopic(),
 			"ibm_en_subscription": resourceIBMEnSubscription(),
+
+			//Cloudant resource
+			"ibm_cloudant_database":    resourceIbmCloudantDatabase(),
+			"ibm_cloudant_replication": resourceIbmCloudantReplication(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -973,6 +981,8 @@ func Validator() ValidatorDict {
 
 				// Added for Event Notifications
 				"ibm_en_destination": resourceIBMEnDestinationValidator(),
+
+				"ibm_cloudant_replication": resourceIbmCloudantReplicationValidator(),
 			},
 			DataSourceValidatorDictionary: map[string]*ResourceValidator{
 				"ibm_is_subnet":               dataSourceIBMISSubnetValidator(),
