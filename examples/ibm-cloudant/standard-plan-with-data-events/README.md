@@ -1,6 +1,6 @@
 # IBM Cloudant example for Standard plan with data event tracking
 
-This example shows how to create a Standard plan Cloudant instance.
+This example shows how to create a Standard plan Cloudant instance with data event tracking.
 
 To run, configure your IBM Cloudant provider
 

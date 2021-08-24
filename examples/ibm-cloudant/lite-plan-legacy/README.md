@@ -1,6 +1,6 @@
 # IBM Cloudant example for Lite plan with legacy credentials
 
-This example shows how to create a Lite plan Cloudant instance.
+This example shows how to create a Lite plan Cloudant instance with legacy credentials.
 
 To run, configure your IBM Cloudant provider
 
