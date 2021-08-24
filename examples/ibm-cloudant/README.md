@@ -1,71 +1,27 @@
-# Example for CloudantV1
+# Examples for `ibm_cloudant`
 
-This example illustrates how to use the CloudantV1
+Examples in the subfolders illustrate how to use the `ibm_cloudant`.
 
 These types of resources are supported:
 
 * cloudant
 
-## Usage
+## Examples
 
-To run this example you need to execute:
+Examples can be found in the subfolders along with the instuctions how to run them.
 
-```bash
-$ terraform init
-$ terraform plan
-$ terraform apply
-```
-
-Run `terraform destroy` when you don't need these resources.
-
-
-## CloudantV1 resources
-
-cloudant resource:
-
-```hcl
-resource "ibm_cloudant" "cloudant" {
-  // Required arguments:
-  name     = var.service_name
-  location = var.service_location
-  plan     = var.service_plan
-
-  // Optional arguments:
-  capacity = var.cloudant_capacity_throughput_blocks
-
-  enable_cors = var.cloudant_enable_cors
-  cors_config {
-    allow_credentials = var.cloudant_cors_config_allow_credentials
-    origins           = var.cloudant_cors_config_origins
-  }
-
-  legacy_credentials = var.cloudant_legacy_credentials
-  include_data_events = var.cloudant_include_data_events
-
-  timeouts {
-    create = var.cloudant_timeout
-    update = var.cloudant_timeout
-    delete = var.cloudant_timeout
-  }
-}
-```
-
-## CloudantV1 Data sources
-
-cloudant data source:
-
-```hcl
-data "ibm_cloudant" "cloudant" {
-  name     = ibm_cloudant.cloudant.name
-}
-```
+- [Lite plan](lite-plan)
+- [Lite plan with legacy credentials](lite-plan-legacy)
+- [Lite plan with IAM credentials](lite-plan-iam)
+- [Standard plan with custom capacity](standard-plan)
+- [Standard plan with data event tracking](standard-plan-with-data-events)
+- [Standard plan on dedicated hardware](standard-plan-on-dedicated-hw)
 
 ## Assumptions
 
-
 ## Notes
 
-1. With `Lite` plan capacity_throughput_blocks can be set no more than 1.
+1. With `Lite` plan `capacity` can be set no more than 1 throughput blocks.
 1. `parameters` can overwrite the previously set arguments named the same way.
 
 ## Requirements
