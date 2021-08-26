@@ -12,12 +12,12 @@ Each example creates an IBM Cloudant resource instance called `cloudant`.
 
 Examples can be found in the subfolders along with the instuctions how to run them.
 
-- [`Lite` plan](lite-plan)
-- [`Lite` plan with legacy credentials](lite-plan-legacy)
-- [`Lite` plan with IAM credentials](lite-plan-iam)
-- [`Standard` plan with custom capacity](standard-plan)
-- [`Standard` plan with data event tracking](standard-plan-with-data-events)
-- [`Standard` plan on dedicated hardware](standard-plan-on-dedicated-hw)
+- [Lite plan](lite-plan)
+- [Lite plan with legacy credentials](lite-plan-legacy)
+- [Lite plan with IAM credentials](lite-plan-iam)
+- [Standard plan with custom capacity](standard-plan)
+- [Standard plan with data event tracking](standard-plan-with-data-events)
+- [Standard plan on dedicated hardware](standard-plan-on-dedicated-hw)
 
 ## Assumptions
 
