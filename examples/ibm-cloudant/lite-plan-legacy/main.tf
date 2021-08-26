@@ -10,7 +10,7 @@ resource "ibm_cloudant" "cloudant" {
   location = var.service_region
   plan     = "lite"
   // Optional arguments:
-  legacy_credentials = true // Use both legacy credentials and IAM for authentication.
+  legacy_credentials = true // Use either legacy credentials or IAM for authentication
 }
 
 // Create cloudant data source
