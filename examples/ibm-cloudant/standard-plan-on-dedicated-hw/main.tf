@@ -3,14 +3,18 @@ provider "ibm" {
   region           = var.service_region
 }
 
-// Provision cloudant resource instance with Standard plan and dedicated hardware CRN
+data "ibm_service_instance" "cloudant-dedicated-cluster" {
+  name     = var.cloudant_dedicated_hardware_name
+}
+
+// Provision cloudant resource instance with Standard plan and dedicated hardware Cloud Resource Name (CRN)
 resource "ibm_cloudant" "cloudant" {
   // Required arguments:
   name     = "test_standard_plan_on_dedicated_hw_cloudant"
   location = var.service_region
   plan     = "standard"
   // Optional arguments:
-  environment_crn = var.cloudant_cluster_information
+  environment_crn = ibm_service_instance.cloudant-dedicated-cluster.id
 }
 
 // Create cloudant data source

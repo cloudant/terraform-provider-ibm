@@ -17,3 +17,12 @@ resource "ibm_cloudant" "cloudant" {
 data "ibm_cloudant" "cloudant" {
   name     = ibm_cloudant.cloudant.name
 }
+
+// Provision Viewer IAM and legacy credentials for our cloudant resource instance
+// See also https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/resource_key
+resource "ibm_resource_key" "resourceKey" {
+  name                 = "cloudantViewerCredentials"
+  // Valid roles are Writer, Reader, Manager, Administrator, Operator, Viewer, and Editor:
+  role                 = "Viewer"
+  resource_instance_id = data.ibm_cloudant.cloudant.id
+}

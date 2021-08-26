@@ -57,7 +57,6 @@ Examples can be found in the subfolders along with the instuctions how to run th
 | environment_crn | CRN of the IBM Cloudant Dedicated Hardware plan instance. | `string` | false |
 | legacy_credentials | Use both legacy credentials and IAM for authentication. | `bool` | false |
 | include_data_events | Include data event types in events sent to IBM Cloud Activity Tracker with LogDNA for the IBM Cloudant instance. By default only emitted events are of \"management\" type. | `bool` | false
-| instance_crn | CRN of the Key Protect instance housing the encryption key for BYOK. | `string` | false |
 | parameters | Arbitrary parameters to pass. Must be a JSON object. | `map(string)` | false |
 | resource_group_id | The resource group id. | `string` | false |
 | service_endpoints | Types of the service endpoints. Possible values are 'public', 'private', 'public-and-private'. | `string` | false |

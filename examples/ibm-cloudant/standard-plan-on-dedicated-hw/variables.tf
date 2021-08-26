@@ -11,8 +11,8 @@ variable "service_region" {
   default     = "us-south"
 }
 
-// Resource arguments for cloudant_cluster_information
-variable "cloudant_cluster_information" {
+// Resource arguments for cloudant_dedicated_hardware_name
+variable "cloudant_dedicated_hardware_name" {
   description = "The actual physical location of the Dedicated Hardware plan instance."
   type = string
 }
