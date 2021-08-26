@@ -12,12 +12,12 @@ Each example creates an IBM Cloudant resource instance called `cloudant`.
 
 Examples can be found in the subfolders along with the instuctions how to run them.
 
-- [Lite plan](lite-plan)
-- [Lite plan with legacy credentials](lite-plan-legacy)
-- [Lite plan with IAM credentials](lite-plan-iam)
-- [Standard plan with custom capacity](standard-plan)
-- [Standard plan with data event tracking](standard-plan-with-data-events)
-- [Standard plan on dedicated hardware](standard-plan-on-dedicated-hw)
+- [`Lite` plan](lite-plan)
+- [`Lite` plan with legacy credentials](lite-plan-legacy)
+- [`Lite` plan with IAM credentials](lite-plan-iam)
+- [`Standard` plan with custom capacity](standard-plan)
+- [`Standard` plan with data event tracking](standard-plan-with-data-events)
+- [`Standard` plan on dedicated hardware](standard-plan-on-dedicated-hw)
 
 ## Assumptions
 
@@ -25,6 +25,7 @@ Examples can be found in the subfolders along with the instuctions how to run th
 
 1. With `Lite` plan `capacity` can be set no more than 1 throughput blocks.
 1. `parameters` can overwrite the previously set arguments named the same way.
+1. With [`Standard` plan on dedicated hardware](standard-plan-on-dedicated-hw) the hardware must be ordered separately and provisioning should be completed before using Terraform on it
 
 ## Requirements
 
