@@ -3,7 +3,7 @@ provider "ibm" {
   region           = var.service_region
 }
 
-data "ibm_service_instance" "cloudant-dedicated-cluster" {
+data "ibm_resource_instance" "cloudant-dedicated-cluster" {
   name     = var.cloudant_dedicated_hardware_name
 }
 
@@ -14,7 +14,7 @@ resource "ibm_cloudant" "cloudant" {
   location = var.service_region
   plan     = "standard"
   // Optional arguments:
-  environment_crn = ibm_service_instance.cloudant-dedicated-cluster.id
+  environment_crn = ibm_resource_instance.cloudant-dedicated-cluster.id
 }
 
 // Create cloudant data source
