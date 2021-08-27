@@ -10,7 +10,7 @@ Each example creates an IBM Cloudant resource instance called `cloudant`.
 
 ## Examples
 
-Examples can be found in the subfolders along with the instuctions how to run them.
+Examples can be found in the subfolders along with the instructions how to run them.
 
 - [Lite plan](lite-plan)
 - [Lite plan with legacy credentials](lite-plan-legacy)
