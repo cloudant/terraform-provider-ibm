@@ -13,6 +13,6 @@ variable "service_region" {
 
 // Resource arguments for cloudant_dedicated_hardware_name
 variable "cloudant_dedicated_hardware_name" {
-  description = "The actual physical location of the Dedicated Hardware plan instance."
+  description = "The service instance name of the IBM Cloudant dedicated hardware plan."
   type = string
 }
