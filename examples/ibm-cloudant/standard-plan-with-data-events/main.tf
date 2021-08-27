@@ -3,6 +3,15 @@ provider "ibm" {
   region           = var.service_region
 }
 
+// Provision a resource group for the cloudant and the activity tracker resources
+resource "ibm_resource_group" "resourceGroup" {
+  name     = "prod"
+}
+
+data "ibm_resource_group" "group" {
+  is_default = "true"
+}
+
 // Provision cloudant resource instance with Standard plan including data events
 resource "ibm_cloudant" "cloudant" {
   // Required arguments:
@@ -11,6 +20,7 @@ resource "ibm_cloudant" "cloudant" {
   plan     = "standard"
   // Optional arguments:
   include_data_events = true
+  resource_group_id = data.ibm_resource_group.group.id
 }
 
 // Create cloudant data source
@@ -23,8 +33,8 @@ data "ibm_cloudant" "cloudant" {
 module "activity_tracker_instance" {
   source = "terraform-ibm-modules/observability/ibm//modules/activity-tracker-logdna"
 
-  service_name      = data.ibm_cloudant.cloudant.name
+  service_name      = "test_standard_plan_with_data_events_at"
   plan              = "7-day"
   region            = var.service_region
-  resource_group_id = data.ibm_cloudant.cloudant.id
+  resource_group_id = data.ibm_resource_group.group.id
 }
