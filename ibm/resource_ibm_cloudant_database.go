@@ -54,17 +54,16 @@ func resourceIbmCloudantDatabase() *schema.Resource {
 }
 
 func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	instanceId := d.Get("cloudant_guid").(string)
 	cUrl, err := getCloudantInstanceUrl(instanceId, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	dbName := d.Get("db").(string)
 	putDatabaseOptions := &cloudantv1.PutDatabaseOptions{}
@@ -88,11 +87,6 @@ func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.Resour
 }
 
 func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	parts, err := idParts(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
@@ -102,7 +96,11 @@ func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resource
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
 	getDatabaseInformationOptions.SetDb(parts[1])
@@ -135,11 +133,6 @@ func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resource
 }
 
 func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	parts, err := idParts(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
@@ -149,7 +142,11 @@ func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.Resour
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	deleteDatabaseOptions := &cloudantv1.DeleteDatabaseOptions{}
 	deleteDatabaseOptions.SetDb(parts[1])
