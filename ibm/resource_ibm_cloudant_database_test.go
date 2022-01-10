@@ -95,7 +95,7 @@ func testAccCheckIbmCloudantDatabaseConfigBasic(instanceName, db string) string 
 			name              = "%s"
 			service           = "cloudantnosqldb"
 			plan              = "standard"
-			location          = "us-east"
+			location          = "us-south"
 			resource_group_id = data.ibm_resource_group.cloudant.id
 	  	}
 
@@ -117,7 +117,7 @@ func testAccCheckIbmCloudantDatabaseConfig(instanceName, db string, partitioned 
 			name              = "%s"
 			service           = "cloudantnosqldb"
 			plan              = "standard"
-			location          = "us-east"
+			location          = "us-south"
 			resource_group_id = data.ibm_resource_group.cloudant.id
 	  	}
 
@@ -138,11 +138,6 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		cloudantClient, err := testAccProvider.Meta().(ClientSession).CloudantV1()
-		if err != nil {
-			return err
-		}
-
 		parts, err := idParts(rs.Primary.ID)
 		if err != nil {
 			return err
@@ -152,7 +147,11 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 		if err != nil {
 			return err
 		}
-		cloudantClient.Service.Options.URL = cUrl
+
+		cloudantClient, err := getCloudantClientForUrl(cUrl, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 
 		getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
 		getDatabaseInformationOptions.SetDb(parts[1])
@@ -168,11 +167,6 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 }
 
 func testAccCheckIbmCloudantDatabaseDestroy(s *terraform.State) error {
-	cloudantClient, err := testAccProvider.Meta().(ClientSession).CloudantV1()
-	if err != nil {
-		return err
-	}
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "ibm_cloudant_database" {
 			continue
@@ -187,7 +181,11 @@ func testAccCheckIbmCloudantDatabaseDestroy(s *terraform.State) error {
 		if err != nil {
 			return err
 		}
-		cloudantClient.Service.Options.URL = cUrl
+
+		cloudantClient, err := getCloudantClientForUrl(cUrl, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 
 		getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
 		getDatabaseInformationOptions.SetDb(parts[1])

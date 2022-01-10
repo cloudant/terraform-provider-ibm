@@ -152,17 +152,16 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 }
 
 func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	cloudantInstId := d.Get("cloudant_guid").(string)
 	cUrl, err := getCloudantInstanceUrl(cloudantInstId, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
 

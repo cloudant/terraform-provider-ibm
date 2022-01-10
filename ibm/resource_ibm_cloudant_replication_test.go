@@ -79,9 +79,9 @@ func testAccCheckIbmCloudantReplicationConfigBasic(instanceName, db string, part
 			name              = "%s"
 			service           = "cloudantnosqldb"
 			plan              = "standard"
-			location          = "us-east"
+			location          = "us-south"
 			resource_group_id = data.ibm_resource_group.cloudant.id
-	  	}
+		}
 
 		resource "ibm_resource_key" "resource_key" {
 			name                 = "pr_key01"
@@ -136,7 +136,7 @@ func testAccCheckIbmCloudantReplicationConfig(instanceName, db string, partition
 		name              = "%s"
 		service           = "cloudantnosqldb"
 		plan              = "standard"
-		location          = "us-east"
+		location          = "us-south"
 		resource_group_id = data.ibm_resource_group.cloudant.id
 	  }
 
@@ -191,7 +191,7 @@ func testAccCheckIbmCloudantReplicationExists(n string, obj cloudantv1.Replicati
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		cloudantClient, err := testAccProvider.Meta().(ClientSession).CloudantV1()
+		cloudantClient, err := getCloudantClientForUrl(cloudantv1.DefaultServiceURL, testAccProvider.Meta())
 		if err != nil {
 			return err
 		}
@@ -215,7 +215,7 @@ func testAccCheckIbmCloudantReplicationExists(n string, obj cloudantv1.Replicati
 }
 
 func testAccCheckIbmCloudantReplicationDestroy(s *terraform.State) error {
-	cloudantClient, err := testAccProvider.Meta().(ClientSession).CloudantV1()
+	cloudantClient, err := getCloudantClientForUrl(cloudantv1.DefaultServiceURL, testAccProvider.Meta())
 	if err != nil {
 		return err
 	}

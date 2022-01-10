@@ -355,17 +355,16 @@ func resourceIbmCloudantReplicationValidator() *ResourceValidator {
 }
 
 func resourceIbmCloudantReplicationCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	instanceId := d.Get("cloudant_guid").(string)
 	cUrl, err := getCloudantInstanceUrl(instanceId, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	putReplicationDocumentOptions := &cloudantv1.PutReplicationDocumentOptions{}
 	putReplicationDocumentOptions.SetDocID(d.Get("doc_id").(string))
@@ -586,11 +585,6 @@ func resourceIbmCloudantReplicationMapToUserContext(userContextMap map[string]in
 }
 
 func resourceIbmCloudantReplicationRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	parts, err := idParts(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
@@ -601,7 +595,11 @@ func resourceIbmCloudantReplicationRead(context context.Context, d *schema.Resou
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
 	getReplicationDocumentOptions.SetDocID(parts[1])
@@ -784,11 +782,6 @@ func resourceIbmCloudantReplicationUserContextToMap(userContext cloudantv1.UserC
 }
 
 func resourceIbmCloudantReplicationDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantClient, err := meta.(ClientSession).CloudantV1()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	parts, err := idParts(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
@@ -799,7 +792,11 @@ func resourceIbmCloudantReplicationDelete(context context.Context, d *schema.Res
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	cloudantClient.Service.Options.URL = cUrl
+
+	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
 	getReplicationDocumentOptions.SetDocID(parts[1])

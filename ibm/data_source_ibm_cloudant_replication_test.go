@@ -43,7 +43,7 @@ func testAccCheckIbmCloudantReplicationDataSourceConfigBasic(instanceName, db st
 			name              = "%s"
 			service           = "cloudantnosqldb"
 			plan              = "standard"
-			location          = "us-east"
+			location          = "us-south"
 			resource_group_id = data.ibm_resource_group.cloudant.id
 	  	}
 
