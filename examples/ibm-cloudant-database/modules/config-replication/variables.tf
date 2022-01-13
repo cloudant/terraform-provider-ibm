@@ -2,8 +2,8 @@
 # IBMCLOUD Cloudant Replication Variables
 #####################################################
 
-variable "cloudant_guid" {
-  description = "Cloudant instance GUID."
+variable "cloudant_instance_crn" {
+  description = "Cloudant instance CRN."
   type        = string
 }
 

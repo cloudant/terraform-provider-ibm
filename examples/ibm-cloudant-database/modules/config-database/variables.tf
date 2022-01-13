@@ -1,7 +1,7 @@
 
 
-variable "cloudant_guid" {
-  description = "The cloudant instance GUID"
+variable "cloudant_instance_crn" {
+  description = "The cloudant instance CRN"
   type        = string
 }
 

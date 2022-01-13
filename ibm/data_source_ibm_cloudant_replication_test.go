@@ -26,7 +26,7 @@ func TestAccIbmCloudantReplicationDataSourceBasic(t *testing.T) {
 				Config: testAccCheckIbmCloudantReplicationDataSourceConfigBasic(instanceName, db, partitioned, q, docID),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.ibm_cloudant_replication.cloudant_replication", "id"),
-					resource.TestCheckResourceAttrSet("data.ibm_cloudant_replication.cloudant_replication", "cloudant_guid"),
+					resource.TestCheckResourceAttrSet("data.ibm_cloudant_replication.cloudant_replication", "instance_crn"),
 				),
 			},
 		},
@@ -54,7 +54,7 @@ func testAccCheckIbmCloudantReplicationDataSourceConfigBasic(instanceName, db st
 		}  
 
 		resource "ibm_cloudant_database" "cloudant_database" {
-			cloudant_guid = ibm_resource_instance.cloudant_instance.guid
+			instance_crn = ibm_resource_instance.cloudant_instance.crn
 			db = "_replicator"
 			partitioned = %s
 			q = %s
@@ -62,7 +62,7 @@ func testAccCheckIbmCloudantReplicationDataSourceConfigBasic(instanceName, db st
 
 		resource "ibm_cloudant_replication" "cloudant_replication" {
 			doc_id = "%s"
-			cloudant_guid = ibm_cloudant_database.cloudant_database.cloudant_guid
+			instance_crn = ibm_cloudant_database.cloudant_database.instance_crn
 			replication_document {
 				id = "%s"
 				create_target = false
@@ -89,7 +89,7 @@ func testAccCheckIbmCloudantReplicationDataSourceConfigBasic(instanceName, db st
 
 		data "ibm_cloudant_replication" "cloudant_replication" {
 			doc_id = "%s"
-			cloudant_guid = ibm_cloudant_replication.cloudant_replication.cloudant_guid
+			instance_crn = ibm_cloudant_replication.cloudant_replication.instance_crn
 		}
 	`, instanceName, partitioned, q, docID, docID, docID)
 }

@@ -90,7 +90,7 @@ func testAccCheckIbmCloudantReplicationConfigBasic(instanceName, db string, part
 		}  
 
 		resource "ibm_cloudant_database" "cloudant_database" {
-			cloudant_guid = ibm_resource_instance.cloudant_instance.guid
+			instance_crn = ibm_resource_instance.cloudant_instance.crn
 			db = "_replicator"
 			partitioned = %s
 			q = %s
@@ -98,7 +98,7 @@ func testAccCheckIbmCloudantReplicationConfigBasic(instanceName, db string, part
 
 		resource "ibm_cloudant_replication" "cloudant_replication" {
 			doc_id = "%s"
-			cloudant_guid = ibm_cloudant_database.cloudant_database.cloudant_guid
+			instance_crn = ibm_cloudant_database.cloudant_database.instance_crn
 			replication_document {
 				id = "%s"
 				create_target = false
@@ -147,7 +147,7 @@ func testAccCheckIbmCloudantReplicationConfig(instanceName, db string, partition
 	}  
 
 	resource "ibm_cloudant_database" "cloudant_database" {
-		cloudant_guid = ibm_resource_instance.cloudant_instance.guid
+		instance_crn = ibm_resource_instance.cloudant_instance.crn
 		db = "_replicator"
 		partitioned = %s
 		q = %s
@@ -155,7 +155,7 @@ func testAccCheckIbmCloudantReplicationConfig(instanceName, db string, partition
 
 	resource "ibm_cloudant_replication" "cloudant_replication" {
 		doc_id = "%s"
-		cloudant_guid = ibm_cloudant_database.cloudant_database.cloudant_guid
+		instance_crn = ibm_cloudant_database.cloudant_database.instance_crn
 		new_edits = true
 		replication_document {
 			id = "%s"
@@ -196,13 +196,14 @@ func testAccCheckIbmCloudantReplicationExists(n string, obj cloudantv1.Replicati
 			return err
 		}
 
-		parts, err := sepIdParts(rs.Primary.ID, "/")
-		if err != nil {
-			return err
-		}
+		// parts, err := sepIdParts(rs.Primary.ID, "/")
+		// if err != nil {
+		// 	return err
+		// }
 
-		getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
-		getReplicationDocumentOptions.SetDocID(parts[1])
+		docID := rs.Primary.Attributes["doc_id"]
+		getReplicationDocumentOptions := cloudantClient.NewGetReplicationDocumentOptions(docID)
+		// getReplicationDocumentOptions.SetDocID(parts[len(parts)-1])
 
 		documentResult, _, err := cloudantClient.GetReplicationDocument(getReplicationDocumentOptions)
 		if err != nil {
@@ -224,14 +225,15 @@ func testAccCheckIbmCloudantReplicationDestroy(s *terraform.State) error {
 			continue
 		}
 
-		getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
+		docID := rs.Primary.Attributes["doc_id"]
+		getReplicationDocumentOptions := cloudantClient.NewGetReplicationDocumentOptions(docID)
 
-		parts, err := sepIdParts(rs.Primary.ID, "/")
-		if err != nil {
-			return err
-		}
+		// parts, err := sepIdParts(rs.Primary.ID, "/")
+		// if err != nil {
+		// 	return err
+		// }
 
-		getReplicationDocumentOptions.SetDocID(parts[1])
+		// getReplicationDocumentOptions.SetDocID(parts[len(parts)-1])
 
 		// Try to find the key
 		_, _, err = cloudantClient.GetReplicationDocument(getReplicationDocumentOptions)

@@ -100,7 +100,7 @@ func testAccCheckIbmCloudantDatabaseConfigBasic(instanceName, db string) string 
 	  	}
 
 		resource "ibm_cloudant_database" "cloudant_database" {
-			cloudant_guid = ibm_resource_instance.cloudant_instance.guid
+			instance_crn = ibm_resource_instance.cloudant_instance.crn
 			db = "%s"
 		}
 	`, instanceName, db)
@@ -122,7 +122,7 @@ func testAccCheckIbmCloudantDatabaseConfig(instanceName, db string, partitioned 
 	  	}
 
 		resource "ibm_cloudant_database" "cloudant_database" {
-			cloudant_guid = ibm_resource_instance.cloudant_instance.guid
+			instance_crn = ibm_resource_instance.cloudant_instance.crn
 			db = "%s"
 			partitioned = %s
 			q = %s
@@ -138,12 +138,8 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		parts, err := idParts(rs.Primary.ID)
-		if err != nil {
-			return err
-		}
-
-		cUrl, err := getCloudantInstanceUrl(parts[0], testAccProvider.Meta())
+		instanceCRN := rs.Primary.Attributes["instance_crn"]
+		cUrl, err := getCloudantInstanceUrl(instanceCRN, testAccProvider.Meta())
 		if err != nil {
 			return err
 		}
@@ -153,8 +149,8 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 			return err
 		}
 
-		getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
-		getDatabaseInformationOptions.SetDb(parts[1])
+		dbName := rs.Primary.Attributes["db"]
+		getDatabaseInformationOptions := cloudantClient.NewGetDatabaseInformationOptions(dbName)
 
 		documentResult, _, err := cloudantClient.GetDatabaseInformation(getDatabaseInformationOptions)
 		if err != nil {
@@ -172,12 +168,8 @@ func testAccCheckIbmCloudantDatabaseDestroy(s *terraform.State) error {
 			continue
 		}
 
-		parts, err := idParts(rs.Primary.ID)
-		if err != nil {
-			return err
-		}
-
-		cUrl, err := getCloudantInstanceUrl(parts[0], testAccProvider.Meta())
+		instanceCRN := rs.Primary.Attributes["instance_crn"]
+		cUrl, err := getCloudantInstanceUrl(instanceCRN, testAccProvider.Meta())
 		if err != nil {
 			return err
 		}
@@ -187,8 +179,8 @@ func testAccCheckIbmCloudantDatabaseDestroy(s *terraform.State) error {
 			return err
 		}
 
-		getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
-		getDatabaseInformationOptions.SetDb(parts[1])
+		dbName := rs.Primary.Attributes["db"]
+		getDatabaseInformationOptions := cloudantClient.NewGetDatabaseInformationOptions(dbName)
 
 		// Try to find the key
 		_, _, err = cloudantClient.GetDatabaseInformation(getDatabaseInformationOptions)

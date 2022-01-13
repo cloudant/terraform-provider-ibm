@@ -14,7 +14,7 @@ Provides a read-only data source for cloudant_replication document. You can then
 
 ```hcl
 data "ibm_cloudant_replication" "cloudant_replication" {
-  cloudant_guid = var.cloudant_guid
+  instance_crn  = var.instance_crn
   doc_id        = var.doc_id
 }
 ```
@@ -23,7 +23,7 @@ data "ibm_cloudant_replication" "cloudant_replication" {
 
 The following arguments are supported:
 
-* `cloudant_guid` - (Required, string) Path parameter to specify the cloudant instance GUID.
+* `instance_crn` - (Required, string) Path parameter to specify the cloudant instance CRN.
 * `doc_id` - (Required, string) Path parameter to specify the database name.
 * `rev` - (Optional, string) Schema for a document revision identifier.
 * `version` - (Optional, string) Version of the cloudant_replication.

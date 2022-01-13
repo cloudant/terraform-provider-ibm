@@ -14,7 +14,7 @@ Provides a resource for cloudant_replication. This allows cloudant_replication t
 
 ```hcl
 resource "ibm_cloudant_replication" "cloudant_replication_doc" {
-  cloudant_guid = var.cloudant_guid
+  instance_crn  = var.instance_crn
   doc_id        = var.doc_id
 
   replication_document {
@@ -49,7 +49,7 @@ resource "ibm_cloudant_replication" "cloudant_replication_doc" {
 
 The following arguments are supported:
 
-* `cloudant_guid` - (Required, string) Path parameter to specify the cloudant instance GUID.
+* `instance_crn` - (Required, string) Path parameter to specify the cloudant instance CRN.
 * `doc_id` - (Required, Forces new resource, string) Path parameter to specify the document ID.
   * Constraints: The value must match regular expression `/[^_].*/`
 * `replication_document` - (Required, Forces new resource, List) HTTP request body for replication operations.
@@ -112,14 +112,14 @@ In addition to all arguments above, the following attributes are exported:
 ## Import
 
 You can import the `cloudant_replication` resource by using `ID`.
-The `ID` property can be formed from `cloudant_guid`, and `doc_id` in the following format:
+The `ID` property can be formed from `instance_crn`, and `doc_id` in the following format:
 
 ```
-<cloudant_guid>/<doc_id>
+<instance_crn>/<doc_id>
 ```
-* `cloudant_guid`: A string. Path parameter to specify the cloudant instance GUID.
+* `instance_crn`: A string. Path parameter to specify the cloudant instance CRN.
 * `doc_id`: A string. Path parameter to specify the document ID.
 
 ```
-$ terraform import ibm_cloudant_replication.cloudant_replication <cloudant_guid>/<doc_id>
+$ terraform import ibm_cloudant_replication.cloudant_replication <instance_crn>/<doc_id>
 ```

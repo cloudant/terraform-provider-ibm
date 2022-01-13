@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -31,11 +32,11 @@ func resourceIbmCloudantReplication() *schema.Resource {
 				ValidateFunc: InvokeValidator("ibm_cloudant_replication", "doc_id"),
 				Description:  "Path parameter to specify the document ID.",
 			},
-			"cloudant_guid": &schema.Schema{
+			"instance_crn": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Cloudant Instance GUID.",
+				Description: "Cloudant Instance CRN.",
 			},
 			"replication_document": &schema.Schema{
 				Type:        schema.TypeList,
@@ -355,8 +356,8 @@ func resourceIbmCloudantReplicationValidator() *ResourceValidator {
 }
 
 func resourceIbmCloudantReplicationCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	instanceId := d.Get("cloudant_guid").(string)
-	cUrl, err := getCloudantInstanceUrl(instanceId, meta)
+	instanceCRN := d.Get("instance_crn").(string)
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -395,7 +396,7 @@ func resourceIbmCloudantReplicationCreate(context context.Context, d *schema.Res
 		return diag.FromErr(fmt.Errorf("PutReplicationDocumentWithContext failed %s\n%s", err, response))
 	}
 
-	d.SetId(fmt.Sprintf("%s/%s", instanceId, *documentResult.ID))
+	d.SetId(fmt.Sprintf("%s/%s", instanceCRN, *documentResult.ID))
 
 	return resourceIbmCloudantReplicationRead(context, d, meta)
 }
@@ -590,8 +591,8 @@ func resourceIbmCloudantReplicationRead(context context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	instanceId := parts[0]
-	cUrl, err := getCloudantInstanceUrl(instanceId, meta)
+	instanceCRN, docID := strings.Join(parts[:len(parts)-1], "/"), parts[len(parts)-1]
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -602,7 +603,7 @@ func resourceIbmCloudantReplicationRead(context context.Context, d *schema.Resou
 	}
 
 	getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
-	getReplicationDocumentOptions.SetDocID(parts[1])
+	getReplicationDocumentOptions.SetDocID(docID)
 
 	replicationDocument, response, err := cloudantClient.GetReplicationDocumentWithContext(context, getReplicationDocumentOptions)
 	if err != nil {
@@ -614,7 +615,7 @@ func resourceIbmCloudantReplicationRead(context context.Context, d *schema.Resou
 		return diag.FromErr(fmt.Errorf("GetReplicationDocumentWithContext failed %s\n%s", err, response))
 	}
 
-	d.Set("cloudant_guid", instanceId)
+	d.Set("instance_crn", instanceCRN)
 	if err = d.Set("doc_id", *replicationDocument.ID); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting doc_id: %s", err))
 	}
@@ -787,8 +788,8 @@ func resourceIbmCloudantReplicationDelete(context context.Context, d *schema.Res
 		return diag.FromErr(err)
 	}
 
-	instanceId := parts[0]
-	cUrl, err := getCloudantInstanceUrl(instanceId, meta)
+	instanceCRN, docID := strings.Join(parts[:len(parts)-1], "/"), parts[len(parts)-1]
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -799,7 +800,7 @@ func resourceIbmCloudantReplicationDelete(context context.Context, d *schema.Res
 	}
 
 	getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
-	getReplicationDocumentOptions.SetDocID(parts[1])
+	getReplicationDocumentOptions.SetDocID(docID)
 
 	replicationDocument, response, err := cloudantClient.GetReplicationDocumentWithContext(context, getReplicationDocumentOptions)
 	if err != nil {
@@ -807,7 +808,7 @@ func resourceIbmCloudantReplicationDelete(context context.Context, d *schema.Res
 	}
 
 	deleteReplicationDocumentOptions := &cloudantv1.DeleteReplicationDocumentOptions{}
-	deleteReplicationDocumentOptions.SetDocID(parts[1])
+	deleteReplicationDocumentOptions.SetDocID(*replicationDocument.ID)
 	deleteReplicationDocumentOptions.SetRev(*replicationDocument.Rev)
 
 	_, response, err = cloudantClient.DeleteReplicationDocumentWithContext(context, deleteReplicationDocumentOptions)

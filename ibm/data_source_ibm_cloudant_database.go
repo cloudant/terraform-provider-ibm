@@ -25,10 +25,10 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 				Required:    true,
 				Description: "Path parameter to specify the database name.",
 			},
-			"cloudant_guid": &schema.Schema{
+			"instance_crn": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Cloudant Instance GUID.",
+				Description: "Cloudant Instance CRN.",
 			},
 			"cluster": &schema.Schema{
 				Type:        schema.TypeList,
@@ -152,8 +152,8 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 }
 
 func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantInstId := d.Get("cloudant_guid").(string)
-	cUrl, err := getCloudantInstanceUrl(cloudantInstId, meta)
+	instanceCRN := d.Get("instance_crn").(string)
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -163,9 +163,8 @@ func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
-
-	getDatabaseInformationOptions.SetDb(d.Get("db").(string))
+	dbName := d.Get("db").(string)
+	getDatabaseInformationOptions := cloudantClient.NewGetDatabaseInformationOptions(dbName)
 
 	databaseInformation, response, err := cloudantClient.GetDatabaseInformationWithContext(context, getDatabaseInformationOptions)
 	if err != nil {

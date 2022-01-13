@@ -79,10 +79,10 @@ NOTE: We can set the create, update and delete timeouts as string. For e.g say w
 | Name                    | Description                            |
 |-------------------------|----------------------------------------|
 | pri_cloudant_key_id     | ID of the primary cloudant key         |
-| pri_cloudant_guid       | GUID of the primary cloudant instance  |
+| pri_instance_crn        | CRN of the primary cloudant instance   |
 | pri_cloudant_id         | ID of the primary cloudant instance    |
 | dr_cloudant_key_id      | ID of the dr cloudant key              |
-| dr_cloudant_guid        | GUID of the dr cloudant instance       |
+| dr_instance_crn         | CRN of the dr cloudant instance        |
 | dr_cloudant_id          | ID of the dr cloudant instance         |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

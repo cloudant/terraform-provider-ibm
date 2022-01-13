@@ -50,13 +50,13 @@ func testAccCheckIbmCloudantDatabaseDataSourceConfigBasic() string {
 	  		}
 
 			resource "ibm_cloudant_database" "cloudant_database" {
-				cloudant_guid = ibm_resource_instance.cloudant_instance.guid
+				instance_crn = ibm_resource_instance.cloudant_instance.crn
 				db = "db"
 			}
 
 			data "ibm_cloudant_database" "cloudant_database" {
 				db = ibm_cloudant_database.cloudant_database.db
-				cloudant_guid = ibm_cloudant_database.cloudant_database.cloudant_guid
+				instance_crn = ibm_cloudant_database.cloudant_database.instance_crn
 			}
 	`)
 }
