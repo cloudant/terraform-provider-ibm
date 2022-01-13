@@ -14,7 +14,7 @@ Provides a read-only data source for cloudant_database. You can then reference t
 
 ```hcl
 data "ibm_cloudant_database" "cloudant_database" {
-	cloudant_guid = var.cloudant_guid
+	instance_crn  = var.instance_crn
   	db            = var.db_name
 }
 ```
@@ -23,7 +23,7 @@ data "ibm_cloudant_database" "cloudant_database" {
 
 The following arguments are supported:
 
-* `cloudant_guid` - (Required, string) Path parameter to specify the cloudant instance GUID.
+* `instance_crn` - (Required, string) Path parameter to specify the cloudant instance CRN.
 * `db` - (Required, string) Path parameter to specify the database name.
 
 ## Attribute Reference

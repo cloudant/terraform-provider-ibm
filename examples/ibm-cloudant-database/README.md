@@ -28,7 +28,7 @@ module "cloudant-database" {
   //source = "terraform-ibm-modules/cloudant/ibm//modules/config-database"
 
   source                        = "./modules/config-database"
-  cloudant_guid                 = var.cloudant_guid
+  instance_crn                  = var.cloudant_instance_crn
   cloudant_database_partitioned = var.is_partitioned
   db_name                       = var.db_name
   cloudant_database_q           = var.cloudant_database_q
@@ -44,7 +44,7 @@ module "cloudant-replication" {
   ######################
   # Replication Database
   ######################
-  cloudant_guid                 = var.cloudant_guid
+  instance_crn                  = var.cloudant_instance_crn
   cloudant_database_partitioned = var.is_partitioned
   db_name                       = var.db_name
   cloudant_database_q           = var.cloudant_database_q

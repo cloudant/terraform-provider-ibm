@@ -72,7 +72,7 @@ module "cloudant-database-pr" {
   //source = "terraform-ibm-modules/cloudant/ibm//modules/config-database"
 
   source                        = "./modules/config-database"
-  cloudant_guid                 = module.cloudant-instance-pri.cloudant_guid
+  instance_crn                  = module.cloudant-instance-pri.instance_crn
   cloudant_database_partitioned = var.is_partitioned
   db_name                       = var.db_name
   cloudant_database_q           = var.cloudant_database_q
@@ -86,7 +86,7 @@ module "cloudant-database-dr" {
 
   source                        = "./modules/config-database"
   count                         = var.is_dr_provision ? 1 : 0
-  cloudant_guid                 = module.cloudant-instance-dr.0.cloudant_guid
+  instance_crn                  = module.cloudant-instance-dr.0.instance_crn
   cloudant_database_partitioned = var.is_partitioned
   db_name                       = var.db_name
   cloudant_database_q           = var.cloudant_database_q
@@ -102,7 +102,7 @@ module "cloudant-replication-pri" {
   ######################
   # Replication Database
   ######################
-  cloudant_guid                 = module.cloudant-instance-pri.cloudant_guid
+  instance_crn                  = module.cloudant-instance-pri.instance_crn
   cloudant_database_partitioned = var.is_partitioned
   db_name                       = var.db_name
   cloudant_database_q           = var.cloudant_database_q
@@ -129,7 +129,7 @@ module "cloudant-replication-dr" {
   ######################
   # Replication Database
   ######################
-  cloudant_guid                 = module.cloudant-instance-dr.0.cloudant_guid
+  instance_crn                  = module.cloudant-instance-dr.0.instance_crn
   cloudant_database_partitioned = var.is_partitioned
   db_name                       = var.db_name
   cloudant_database_q           = var.cloudant_database_q

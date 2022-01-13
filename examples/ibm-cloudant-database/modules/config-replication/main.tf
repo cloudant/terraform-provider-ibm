@@ -1,7 +1,7 @@
 
 // Provision replication database
 resource "ibm_cloudant_database" "cloudant_replicator_db" {
-  cloudant_guid = var.cloudant_guid
+  instance_crn  = var.cloudant_instance_crn
   db            = "_replicator"
   partitioned   = var.cloudant_database_partitioned
   q             = var.cloudant_database_q
@@ -9,7 +9,7 @@ resource "ibm_cloudant_database" "cloudant_replicator_db" {
 
 // Provision cloudant_replication resource instance
 resource "ibm_cloudant_replication" "cloudant_replication_doc" {
-  cloudant_guid = ibm_cloudant_database.cloudant_replicator_db.cloudant_guid
+  instance_crn  = ibm_cloudant_database.cloudant_replicator_db.instance_crn
   doc_id        = var.cloudant_replication_doc_id
 
   replication_document {
@@ -41,6 +41,6 @@ resource "ibm_cloudant_replication" "cloudant_replication_doc" {
 }
 
 data "ibm_cloudant_replication" "read_doc" {
-  cloudant_guid = ibm_cloudant_replication.cloudant_replication_doc.cloudant_guid
+  instance_crn  = ibm_cloudant_replication.cloudant_replication_doc.instance_crn
   doc_id        = var.cloudant_replication_doc_id
 }

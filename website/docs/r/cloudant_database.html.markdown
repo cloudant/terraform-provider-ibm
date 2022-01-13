@@ -14,7 +14,7 @@ Provides a resource for cloudant_database. This allows cloudant_database to be c
 
 ```hcl
 resource "ibm_cloudant_database" "cloudant_database" {
-  cloudant_guid = var.cloudant_guid
+  instance_crn  = var.instance_crn
   db            = var.db_name
 }  
 ```
@@ -23,7 +23,7 @@ resource "ibm_cloudant_database" "cloudant_database" {
 
 The following arguments are supported:
 
-* `cloudant_guid` - (Required, string) Path parameter to specify the cloudant instance GUID.
+* `instance_crn` - (Required, string) Path parameter to specify the cloudant instance CRN.
 * `db` - (Required, Forces new resource, string) Path parameter to specify the database name.
 * `partitioned` - (Optional, Forces new resource, bool) Query parameter to specify whether to enable database partitions when creating a database.
   * Constraints: The default value is `false`.
@@ -39,14 +39,14 @@ In addition to all arguments above, the following attributes are exported:
 ## Import
 
 You can import the `cloudant_database` resource by using `ID`.
-The `ID` property can be formed from `cloudant_guid`, and `db` in the following format:
+The `ID` property can be formed from `instance_crn`, and `db` in the following format:
 
 ```
-<cloudant_guid>/<db>
+<instance_crn>/<db>
 ```
-* `cloudant_guid`: A string. Path parameter to specify the cloudant instance GUID.
+* `instance_crn`: A string. Path parameter to specify the cloudant instance CRN.
 * `db`: A string. Path parameter to specify the database name.
 
 ```
-$ terraform import ibm_cloudant_database.cloudant_database <cloudant_guid>/<db>
+$ terraform import ibm_cloudant_database.cloudant_database <instance_crn>/<db>
 ```

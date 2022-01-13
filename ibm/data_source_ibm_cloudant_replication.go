@@ -10,8 +10,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-
-	"github.com/IBM/cloudant-go-sdk/cloudantv1"
 )
 
 func dataSourceIbmCloudantReplication() *schema.Resource {
@@ -25,10 +23,10 @@ func dataSourceIbmCloudantReplication() *schema.Resource {
 				ValidateFunc: InvokeValidator("ibm_cloudant_replication", "doc_id"),
 				Description:  "Path parameter to specify the document ID.",
 			},
-			"cloudant_guid": &schema.Schema{
+			"instance_crn": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Cloudant Instance GUID.",
+				Description: "Cloudant Instance CRN.",
 			},
 			"rev": &schema.Schema{
 				Type:        schema.TypeString,
@@ -284,9 +282,9 @@ func dataSourceIbmCloudantReplication() *schema.Resource {
 }
 
 func dataSourceIbmCloudantReplicationRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	cloudantInstId := d.Get("cloudant_guid").(string)
+	instanceCRN := d.Get("instance_crn").(string)
 	docID := d.Get("doc_id").(string)
-	cUrl, err := getCloudantInstanceUrl(cloudantInstId, meta)
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -296,8 +294,7 @@ func dataSourceIbmCloudantReplicationRead(context context.Context, d *schema.Res
 		return diag.FromErr(err)
 	}
 
-	getReplicationDocumentOptions := &cloudantv1.GetReplicationDocumentOptions{}
-	getReplicationDocumentOptions.SetDocID(docID)
+	getReplicationDocumentOptions := cloudantClient.NewGetReplicationDocumentOptions(docID)
 
 	replicationDocument, response, err := cloudantClient.GetReplicationDocumentWithContext(context, getReplicationDocumentOptions)
 	if err != nil {

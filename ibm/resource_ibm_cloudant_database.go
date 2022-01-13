@@ -7,11 +7,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/IBM/cloudant-go-sdk/cloudantv1"
 	rc "github.com/IBM/platform-services-go-sdk/resourcecontrollerv2"
 )
 
@@ -23,11 +23,11 @@ func resourceIbmCloudantDatabase() *schema.Resource {
 		Importer:      &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
-			"cloudant_guid": &schema.Schema{
+			"instance_crn": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Cloudant Instance ID.",
+				Description: "Cloudant Instance CRN.",
 			},
 			"db": &schema.Schema{
 				Type:        schema.TypeString,
@@ -54,8 +54,8 @@ func resourceIbmCloudantDatabase() *schema.Resource {
 }
 
 func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	instanceId := d.Get("cloudant_guid").(string)
-	cUrl, err := getCloudantInstanceUrl(instanceId, meta)
+	instanceCRN := d.Get("instance_crn").(string)
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -66,8 +66,7 @@ func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.Resour
 	}
 
 	dbName := d.Get("db").(string)
-	putDatabaseOptions := &cloudantv1.PutDatabaseOptions{}
-	putDatabaseOptions.SetDb(dbName)
+	putDatabaseOptions := cloudantClient.NewPutDatabaseOptions(dbName)
 	if _, ok := d.GetOk("partitioned"); ok {
 		putDatabaseOptions.SetPartitioned(d.Get("partitioned").(bool))
 	}
@@ -81,7 +80,7 @@ func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.Resour
 		return diag.FromErr(fmt.Errorf("PutDatabaseWithContext failed %s\n%s", err, response))
 	}
 
-	d.SetId(fmt.Sprintf("%s/%s", instanceId, dbName))
+	d.SetId(fmt.Sprintf("%s/%s", instanceCRN, dbName))
 
 	return resourceIbmCloudantDatabaseRead(context, d, meta)
 }
@@ -92,7 +91,8 @@ func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	cUrl, err := getCloudantInstanceUrl(parts[0], meta)
+	instanceCRN, dbName := strings.Join(parts[:len(parts)-1], "/"), parts[len(parts)-1]
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -102,8 +102,7 @@ func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	getDatabaseInformationOptions := &cloudantv1.GetDatabaseInformationOptions{}
-	getDatabaseInformationOptions.SetDb(parts[1])
+	getDatabaseInformationOptions := cloudantClient.NewGetDatabaseInformationOptions(dbName)
 
 	databaseInformation, response, err := cloudantClient.GetDatabaseInformationWithContext(context, getDatabaseInformationOptions)
 	if err != nil {
@@ -115,7 +114,7 @@ func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resource
 		return diag.FromErr(fmt.Errorf("GetDatabaseInformationWithContext failed %s\n%s", err, response))
 	}
 
-	d.Set("cloudant_guid", parts[0])
+	d.Set("instance_crn", instanceCRN)
 
 	if err = d.Set("db", *databaseInformation.DbName); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting db: %s", err))
@@ -138,7 +137,8 @@ func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	cUrl, err := getCloudantInstanceUrl(parts[0], meta)
+	instanceCRN, dbName := strings.Join(parts[:len(parts)-1], "/"), parts[len(parts)-1]
+	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -148,8 +148,7 @@ func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	deleteDatabaseOptions := &cloudantv1.DeleteDatabaseOptions{}
-	deleteDatabaseOptions.SetDb(parts[1])
+	deleteDatabaseOptions := cloudantClient.NewDeleteDatabaseOptions(dbName)
 
 	_, response, err := cloudantClient.DeleteDatabaseWithContext(context, deleteDatabaseOptions)
 	if err != nil {
@@ -162,14 +161,14 @@ func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.Resour
 	return nil
 }
 
-func getCloudantInstanceUrl(instanceId string, meta interface{}) (string, error) {
+func getCloudantInstanceUrl(instanceCRN string, meta interface{}) (string, error) {
 	rsConClient, err := meta.(ClientSession).ResourceControllerV2API()
 	if err != nil {
 		return "", err
 	}
 
 	resourceInstanceGet := rc.GetResourceInstanceOptions{
-		ID: ptrToString(instanceId),
+		ID: ptrToString(instanceCRN),
 	}
 
 	instance, resp, err := rsConClient.GetResourceInstance(&resourceInstanceGet)
