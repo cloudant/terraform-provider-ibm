@@ -19,5 +19,5 @@ variable "cloudant_database_partitioned" {
 variable "cloudant_database_q" {
   description = "The number of shards in the database. Each shard is a partition of the hash value range. Default is 8, unless overridden in the `cluster config`."
   type        = number
-  default     = 0
+  default     = 8
 }

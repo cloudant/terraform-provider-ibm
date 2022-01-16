@@ -63,7 +63,7 @@ resource "ibm_iam_service_id" "serviceID" {
   description = (var.description != null ? var.description : null)
 }
 
-data "ibm_iam_service_id" "ds_serviceID" {
+data "ibm_iam_service_id" "data_serviceID" {
   count = var.service_policy_provision ? 0 : 1
   name  = var.service_name
 }
