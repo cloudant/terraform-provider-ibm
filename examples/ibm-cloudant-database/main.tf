@@ -1,9 +1,3 @@
-locals {
-  parameters = {
-    legacyCredentials = (var.legacy_credentials != null ? var.legacy_credentials : null)
-  }
-}
-
 data "ibm_resource_group" "res_group" {
   name = var.rg_name
 }
@@ -16,16 +10,16 @@ module "cloudant-instance" {
   provision              = var.provision
   provision_resource_key = var.provision_resource_key
 
-  instance_name     = var.instance_name
-  resource_group_id = data.ibm_resource_group.res_group.id
-  plan              = var.plan
-  region            = var.region
-  service_endpoints = var.service_endpoints
-  parameters        = local.parameters
-  tags              = var.tags
-  resource_key_name = var.resource_key
-  role              = var.role
-  resource_key_tags = var.resource_key_tags
+  instance_name      = var.instance_name
+  resource_group_id  = data.ibm_resource_group.res_group.id
+  plan               = var.plan
+  region             = var.region
+  service_endpoints  = var.service_endpoints
+  legacy_credentials = var.legacy_credentials
+  tags               = var.tags
+  resource_key_name  = var.resource_key
+  role               = var.role
+  resource_key_tags  = var.resource_key_tags
 
   ###################
   # Service Policy

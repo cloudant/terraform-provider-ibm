@@ -28,7 +28,7 @@ The following arguments are supported:
 * `partitioned` - (Optional, Forces new resource, bool) Query parameter to specify whether to enable database partitions when creating a database.
   * Constraints: The default value is `false`.
 * `q` - (Optional, Forces new resource, int) The number of shards in the database. Each shard is a partition of the hash value range. Default is 8, unless overridden in the `cluster config`.
-  * Constraints: The maximum value is `5120`. The minimum value is `1`.
+  * Constraints: The minimum value is `1`.
 
 ## Attribute Reference
 

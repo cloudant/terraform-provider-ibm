@@ -44,7 +44,7 @@ variable "rg_name" {
 variable "legacy_credentials" {
   description = "Legacy authentication method for cloudant"
   type        = bool
-  default     = null
+  default     = false
 }
 
 variable "plan" {
@@ -119,7 +119,7 @@ variable "is_partitioned" {
 }
 
 variable "cloudant_database_q" {
-  description = "The number of shards in the database. Each shard is a partition of the hash value range. Default is 8, unless overridden in the `cluster config`."
+  description = "The number of shards in the database. Each shard is a partition of the hash value range. When omitted the default is set by the server."
   type        = number
-  default     = 0
+  default     = null
 }

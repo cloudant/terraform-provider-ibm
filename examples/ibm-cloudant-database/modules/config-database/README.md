@@ -25,6 +25,6 @@ module "cloudant-database" {
 | db_name                       | Database name                                                                   | string       | n/a     | yes      |
 | cloudant_instance_crn         | CRN of the cloudant instance.                                                   | string       | n/a     | yes      |
 | cloudant_database_partitioned | Enable partition database                                                       | bool         | false   | no       |
-| cloudant_database_q           | The number of shards in the database.                                           | number       | 8       | no       |
+| cloudant_database_q           | The number of shards in the database. Default set by server.                    | number       | null    | no       |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

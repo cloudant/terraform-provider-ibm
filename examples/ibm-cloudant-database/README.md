@@ -4,7 +4,7 @@ This example illustrates how to use the Cloudant database resources
 
 These types of resources are supported:
 
-* ibm_resource_instance
+* ibm_cloudant
 * ibm_cloudant_database
 
 ## Usage
@@ -58,7 +58,7 @@ module "cloudant-database" {
 
 | Name | Version |
 |------|---------|
-| ibm | 1.30+ |
+| ibm | 1.38+ |
 
 ## Inputs
 
@@ -79,5 +79,5 @@ module "cloudant-database" {
 | description | Description to service ID | `string` | false |
 | roles | service policy roles | `list` | false |
 | db_name | Database name | `string` | true |
-| is_partitioned | To set whether the database is partitioned | `string` | false |
+| is_partitioned | To set whether the database is partitioned | `bool` | false |
 | cloudant_database_q | The number of shards in the database. Each shard is a partition of the hash value range. Default is 8, unless overridden in the `cluster config` | `number` | false |
