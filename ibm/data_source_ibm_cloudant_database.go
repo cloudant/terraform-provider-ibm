@@ -74,11 +74,6 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 				Computed:    true,
 				Description: "An opaque string that describes the compaction state of the database.",
 			},
-			"db_name": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The name of the database.",
-			},
 			"disk_format_version": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
@@ -190,9 +185,6 @@ func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resour
 	if databaseInformation.CompactedSeq != nil {
 		d.Set("compacted_seq", *databaseInformation.CompactedSeq)
 	}
-	if databaseInformation.DbName != nil {
-		d.Set("db_name", *databaseInformation.DbName)
-	}
 	if databaseInformation.DiskFormatVersion != nil {
 		d.Set("disk_format_version", *databaseInformation.DiskFormatVersion)
 	}
@@ -266,6 +258,8 @@ func dataSourceDatabaseInformationPropsToMap(propsItem cloudantv1.DatabaseInform
 
 	if propsItem.Partitioned != nil {
 		propsMap["partitioned"] = *propsItem.Partitioned
+	} else {
+		propsMap["partitioned"] = false
 	}
 
 	return propsMap
