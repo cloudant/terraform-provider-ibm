@@ -33,18 +33,18 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 			"cluster": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "Schema for database cluster information.",
+				Description: "Database cluster information.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"n": &schema.Schema{
 							Type:        schema.TypeInt,
 							Computed:    true,
-							Description: "Schema for the number of replicas of a database in a cluster.",
+							Description: "The number of replicas of a database in a cluster.",
 						},
 						"q": &schema.Schema{
 							Type:        schema.TypeInt,
 							Computed:    true,
-							Description: "Schema for the number of shards in a database. Each shard is a partition of the hash value range.",
+							Description: "The number of shards in a database. Each shard is a partition of the hash value range.",
 						},
 						"r": &schema.Schema{
 							Type:        schema.TypeInt,
@@ -74,11 +74,6 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 				Computed:    true,
 				Description: "An opaque string that describes the compaction state of the database.",
 			},
-			"db_name": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The name of the database.",
-			},
 			"disk_format_version": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
@@ -102,7 +97,7 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 			"props": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "Schema for database properties.",
+				Description: "The database properties.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"partitioned": &schema.Schema{
@@ -116,23 +111,23 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 			"sizes": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "Schema for size information of content.",
+				Description: "Database size information.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"active": &schema.Schema{
 							Type:        schema.TypeInt,
 							Computed:    true,
-							Description: "The active size of the content, in bytes.",
+							Description: "The active size of the data in the database, in bytes.",
 						},
 						"external": &schema.Schema{
 							Type:        schema.TypeInt,
 							Computed:    true,
-							Description: "The total uncompressed size of the content, in bytes.",
+							Description: "The total uncompressed size of the data in the database, in bytes.",
 						},
 						"file": &schema.Schema{
 							Type:        schema.TypeInt,
 							Computed:    true,
-							Description: "The total size of the content as stored on disk, in bytes.",
+							Description: "The total size of the database as stored on disk, in bytes.",
 						},
 					},
 				},
@@ -189,9 +184,6 @@ func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resour
 	}
 	if databaseInformation.CompactedSeq != nil {
 		d.Set("compacted_seq", *databaseInformation.CompactedSeq)
-	}
-	if databaseInformation.DbName != nil {
-		d.Set("db_name", *databaseInformation.DbName)
 	}
 	if databaseInformation.DiskFormatVersion != nil {
 		d.Set("disk_format_version", *databaseInformation.DiskFormatVersion)
@@ -266,6 +258,8 @@ func dataSourceDatabaseInformationPropsToMap(propsItem cloudantv1.DatabaseInform
 
 	if propsItem.Partitioned != nil {
 		propsMap["partitioned"] = *propsItem.Partitioned
+	} else {
+		propsMap["partitioned"] = false
 	}
 
 	return propsMap

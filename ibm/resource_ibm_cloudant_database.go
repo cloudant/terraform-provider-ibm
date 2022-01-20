@@ -47,7 +47,7 @@ func resourceIbmCloudantDatabase() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
-				Description: "The number of shards in the database. Each shard is a partition of the hash value range. Default is 8, unless overridden in the `cluster config`.",
+				Description: "The number of shards in the database. Each shard is a partition of the hash value range. You are encouraged to talk to support about appropriate values before changing this.",
 			},
 		},
 	}
