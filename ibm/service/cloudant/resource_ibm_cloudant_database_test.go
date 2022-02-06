@@ -1,11 +1,14 @@
-// Copyright IBM Corp. 2021 All Rights Reserved.
+// Copyright IBM Corp. 2021, 2022 All Rights Reserved.
 // Licensed under the Mozilla Public License v2.0
 
-package ibm
+package cloudant_test
 
 import (
 	"fmt"
 	"testing"
+
+	acc "github.com/IBM-Cloud/terraform-provider-ibm/ibm/acctest"
+	"github.com/IBM-Cloud/terraform-provider-ibm/ibm/service/cloudant"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,26 +17,26 @@ import (
 	"github.com/IBM/cloudant-go-sdk/cloudantv1"
 )
 
-func TestAccIbmCloudantDatabaseBasic(t *testing.T) {
+func TestAccIBMCloudantDatabaseBasic(t *testing.T) {
 	var conf cloudantv1.DatabaseInformation
 	instanceName := fmt.Sprintf("tf_instance_%d", acctest.RandIntRange(10, 100))
 	db := fmt.Sprintf("tf_db_%d", acctest.RandIntRange(10, 100))
 	dbUpdate := fmt.Sprintf("tf_db_%d", acctest.RandIntRange(10, 100))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckIbmCloudantDatabaseDestroy,
+		PreCheck:     func() { acc.TestAccPreCheck(t) },
+		Providers:    acc.TestAccProviders,
+		CheckDestroy: testAccCheckIBMCloudantDatabaseDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccCheckIbmCloudantDatabaseConfigBasic(instanceName, db),
+				Config: testAccCheckIBMCloudantDatabaseConfigBasic(instanceName, db),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccCheckIbmCloudantDatabaseExists("ibm_cloudant_database.cloudant_database", conf),
+					testAccCheckIBMCloudantDatabaseExists("ibm_cloudant_database.cloudant_database", conf),
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "db", db),
 				),
 			},
 			resource.TestStep{
-				Config: testAccCheckIbmCloudantDatabaseConfigBasic(instanceName, dbUpdate),
+				Config: testAccCheckIBMCloudantDatabaseConfigBasic(instanceName, dbUpdate),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "db", dbUpdate),
 				),
@@ -42,7 +45,7 @@ func TestAccIbmCloudantDatabaseBasic(t *testing.T) {
 	})
 }
 
-func TestAccIbmCloudantDatabaseAllArgs(t *testing.T) {
+func TestAccIBMCloudantDatabaseAllArgs(t *testing.T) {
 	var conf cloudantv1.DatabaseInformation
 	instanceName := fmt.Sprintf("tf_instance_%d", acctest.RandIntRange(10, 100))
 	db := fmt.Sprintf("tf_db_%d", acctest.RandIntRange(10, 100))
@@ -53,21 +56,21 @@ func TestAccIbmCloudantDatabaseAllArgs(t *testing.T) {
 	qUpdate := "0"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckIbmCloudantDatabaseDestroy,
+		PreCheck:     func() { acc.TestAccPreCheck(t) },
+		Providers:    acc.TestAccProviders,
+		CheckDestroy: testAccCheckIBMCloudantDatabaseDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccCheckIbmCloudantDatabaseConfig(instanceName, db, partitioned, q),
+				Config: testAccCheckIBMCloudantDatabaseConfig(instanceName, db, partitioned, q),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccCheckIbmCloudantDatabaseExists("ibm_cloudant_database.cloudant_database", conf),
+					testAccCheckIBMCloudantDatabaseExists("ibm_cloudant_database.cloudant_database", conf),
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "db", db),
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "partitioned", partitioned),
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "q", q),
 				),
 			},
 			resource.TestStep{
-				Config: testAccCheckIbmCloudantDatabaseConfig(instanceName, dbUpdate, partitionedUpdate, qUpdate),
+				Config: testAccCheckIBMCloudantDatabaseConfig(instanceName, dbUpdate, partitionedUpdate, qUpdate),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "db", dbUpdate),
 					resource.TestCheckResourceAttr("ibm_cloudant_database.cloudant_database", "partitioned", partitionedUpdate),
@@ -84,20 +87,20 @@ func TestAccIbmCloudantDatabaseAllArgs(t *testing.T) {
 	})
 }
 
-func testAccCheckIbmCloudantDatabaseConfigBasic(instanceName, db string) string {
+func testAccCheckIBMCloudantDatabaseConfigBasic(instanceName, db string) string {
 	return fmt.Sprintf(`
 
 		data "ibm_resource_group" "cloudant" {
 			is_default=true
-	  	}
-  
-	  	resource "ibm_resource_instance" "cloudant_instance" {
+		}
+
+		resource "ibm_resource_instance" "cloudant_instance" {
 			name              = "%s"
 			service           = "cloudantnosqldb"
 			plan              = "standard"
 			location          = "us-south"
 			resource_group_id = data.ibm_resource_group.cloudant.id
-	  	}
+		}
 
 		resource "ibm_cloudant_database" "cloudant_database" {
 			instance_crn = ibm_resource_instance.cloudant_instance.crn
@@ -106,20 +109,20 @@ func testAccCheckIbmCloudantDatabaseConfigBasic(instanceName, db string) string 
 	`, instanceName, db)
 }
 
-func testAccCheckIbmCloudantDatabaseConfig(instanceName, db string, partitioned string, q string) string {
+func testAccCheckIBMCloudantDatabaseConfig(instanceName, db string, partitioned string, q string) string {
 	return fmt.Sprintf(`
 
-	  	data "ibm_resource_group" "cloudant" {
+		data "ibm_resource_group" "cloudant" {
 			is_default=true
-	  	}
-	  
-	  	resource "ibm_resource_instance" "cloudant_instance" {
+		}
+
+		resource "ibm_resource_instance" "cloudant_instance" {
 			name              = "%s"
 			service           = "cloudantnosqldb"
 			plan              = "standard"
 			location          = "us-south"
 			resource_group_id = data.ibm_resource_group.cloudant.id
-	  	}
+		}
 
 		resource "ibm_cloudant_database" "cloudant_database" {
 			instance_crn = ibm_resource_instance.cloudant_instance.crn
@@ -130,7 +133,7 @@ func testAccCheckIbmCloudantDatabaseConfig(instanceName, db string, partitioned 
 	`, instanceName, db, partitioned, q)
 }
 
-func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInformation) resource.TestCheckFunc {
+func testAccCheckIBMCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInformation) resource.TestCheckFunc {
 
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -139,12 +142,12 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 		}
 
 		instanceCRN := rs.Primary.Attributes["instance_crn"]
-		cUrl, err := getCloudantInstanceUrl(instanceCRN, testAccProvider.Meta())
+		cUrl, err := cloudant.GetCloudantInstanceUrl(instanceCRN, acc.TestAccProvider.Meta())
 		if err != nil {
 			return err
 		}
 
-		cloudantClient, err := getCloudantClientForUrl(cUrl, testAccProvider.Meta())
+		cloudantClient, err := cloudant.GetCloudantClientForUrl(cUrl, acc.TestAccProvider.Meta())
 		if err != nil {
 			return err
 		}
@@ -162,19 +165,19 @@ func testAccCheckIbmCloudantDatabaseExists(n string, obj cloudantv1.DatabaseInfo
 	}
 }
 
-func testAccCheckIbmCloudantDatabaseDestroy(s *terraform.State) error {
+func testAccCheckIBMCloudantDatabaseDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "ibm_cloudant_database" {
 			continue
 		}
 
 		instanceCRN := rs.Primary.Attributes["instance_crn"]
-		cUrl, err := getCloudantInstanceUrl(instanceCRN, testAccProvider.Meta())
+		cUrl, err := cloudant.GetCloudantInstanceUrl(instanceCRN, acc.TestAccProvider.Meta())
 		if err != nil {
 			return err
 		}
 
-		cloudantClient, err := getCloudantClientForUrl(cUrl, testAccProvider.Meta())
+		cloudantClient, err := cloudant.GetCloudantClientForUrl(cUrl, acc.TestAccProvider.Meta())
 		if err != nil {
 			return err
 		}

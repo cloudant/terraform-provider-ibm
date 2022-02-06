@@ -1,7 +1,7 @@
-// Copyright IBM Corp. 2021 All Rights Reserved.
+// Copyright IBM Corp. 2021, 2022 All Rights Reserved.
 // Licensed under the Mozilla Public License v2.0
 
-package ibm
+package cloudant
 
 import (
 	"context"
@@ -15,9 +15,9 @@ import (
 	"github.com/IBM/cloudant-go-sdk/cloudantv1"
 )
 
-func dataSourceIbmCloudantDatabase() *schema.Resource {
+func DataSourceIBMCloudantDatabase() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: dataSourceIbmCloudantDatabaseRead,
+		ReadContext: dataSourceIBMCloudantDatabaseRead,
 
 		Schema: map[string]*schema.Schema{
 			"db": &schema.Schema{
@@ -146,14 +146,14 @@ func dataSourceIbmCloudantDatabase() *schema.Resource {
 	}
 }
 
-func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceIBMCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	instanceCRN := d.Get("instance_crn").(string)
-	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
+	cUrl, err := GetCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	cloudantClient, err := GetCloudantClientForUrl(cUrl, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -167,7 +167,7 @@ func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resour
 		return diag.FromErr(fmt.Errorf("GetDatabaseInformationWithContext failed %s\n%s", err, response))
 	}
 
-	d.SetId(dataSourceIbmCloudantDatabaseID(d))
+	d.SetId(dataSourceIBMCloudantDatabaseID(d))
 
 	if databaseInformation.Cluster != nil {
 		err = d.Set("cluster", dataSourceDatabaseInformationFlattenCluster(*databaseInformation.Cluster))
@@ -213,8 +213,8 @@ func dataSourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resour
 	return nil
 }
 
-// dataSourceIbmCloudantDatabaseID returns a reasonable ID for the list.
-func dataSourceIbmCloudantDatabaseID(d *schema.ResourceData) string {
+// dataSourceIBMCloudantDatabaseID returns a reasonable ID for the list.
+func dataSourceIBMCloudantDatabaseID(d *schema.ResourceData) string {
 	return time.Now().UTC().String()
 }
 

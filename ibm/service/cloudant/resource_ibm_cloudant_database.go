@@ -1,7 +1,7 @@
-// Copyright IBM Corp. 2021 All Rights Reserved.
+// Copyright IBM Corp. 2021, 2022 All Rights Reserved.
 // Licensed under the Mozilla Public License v2.0
 
-package ibm
+package cloudant
 
 import (
 	"context"
@@ -13,13 +13,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	rc "github.com/IBM/platform-services-go-sdk/resourcecontrollerv2"
+
+	"github.com/IBM-Cloud/terraform-provider-ibm/ibm/conns"
+	"github.com/IBM-Cloud/terraform-provider-ibm/ibm/flex"
 )
 
-func resourceIbmCloudantDatabase() *schema.Resource {
+func ResourceIBMCloudantDatabase() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceIbmCloudantDatabaseCreate,
-		ReadContext:   resourceIbmCloudantDatabaseRead,
-		DeleteContext: resourceIbmCloudantDatabaseDelete,
+		CreateContext: resourceIBMCloudantDatabaseCreate,
+		ReadContext:   resourceIBMCloudantDatabaseRead,
+		DeleteContext: resourceIBMCloudantDatabaseDelete,
 		Importer:      &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
@@ -53,14 +56,14 @@ func resourceIbmCloudantDatabase() *schema.Resource {
 	}
 }
 
-func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCloudantDatabaseCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	instanceCRN := d.Get("instance_crn").(string)
-	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
+	cUrl, err := GetCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	cloudantClient, err := GetCloudantClientForUrl(cUrl, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -82,22 +85,22 @@ func resourceIbmCloudantDatabaseCreate(context context.Context, d *schema.Resour
 
 	d.SetId(fmt.Sprintf("%s/%s", instanceCRN, dbName))
 
-	return resourceIbmCloudantDatabaseRead(context, d, meta)
+	return resourceIBMCloudantDatabaseRead(context, d, meta)
 }
 
-func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	parts, err := idParts(d.Id())
+func resourceIBMCloudantDatabaseRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	parts, err := flex.IdParts(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	instanceCRN, dbName := strings.Join(parts[:len(parts)-1], "/"), parts[len(parts)-1]
-	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
+	cUrl, err := GetCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	cloudantClient, err := GetCloudantClientForUrl(cUrl, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -131,19 +134,19 @@ func resourceIbmCloudantDatabaseRead(context context.Context, d *schema.Resource
 	return nil
 }
 
-func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	parts, err := idParts(d.Id())
+func resourceIBMCloudantDatabaseDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	parts, err := flex.IdParts(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	instanceCRN, dbName := strings.Join(parts[:len(parts)-1], "/"), parts[len(parts)-1]
-	cUrl, err := getCloudantInstanceUrl(instanceCRN, meta)
+	cUrl, err := GetCloudantInstanceUrl(instanceCRN, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	cloudantClient, err := getCloudantClientForUrl(cUrl, meta)
+	cloudantClient, err := GetCloudantClientForUrl(cUrl, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -161,14 +164,14 @@ func resourceIbmCloudantDatabaseDelete(context context.Context, d *schema.Resour
 	return nil
 }
 
-func getCloudantInstanceUrl(instanceCRN string, meta interface{}) (string, error) {
-	rsConClient, err := meta.(ClientSession).ResourceControllerV2API()
+func GetCloudantInstanceUrl(instanceCRN string, meta interface{}) (string, error) {
+	rsConClient, err := meta.(conns.ClientSession).ResourceControllerV2API()
 	if err != nil {
 		return "", err
 	}
 
 	resourceInstanceGet := rc.GetResourceInstanceOptions{
-		ID: ptrToString(instanceCRN),
+		ID: flex.PtrToString(instanceCRN),
 	}
 
 	instance, resp, err := rsConClient.GetResourceInstance(&resourceInstanceGet)
@@ -177,10 +180,10 @@ func getCloudantInstanceUrl(instanceCRN string, meta interface{}) (string, error
 	}
 
 	if instance.Extensions != nil {
-		instanceExtensionMap := Flatten(instance.Extensions)
+		instanceExtensionMap := flex.Flatten(instance.Extensions)
 		if instanceExtensionMap != nil {
 			cloudantInstanceUrl := "https://" + instanceExtensionMap["endpoints.public"]
-			cloudantInstanceUrl = envFallBack([]string{"IBMCLOUD_CLOUDANT_API_ENDPOINT"}, cloudantInstanceUrl)
+			cloudantInstanceUrl = conns.EnvFallBack([]string{"IBMCLOUD_CLOUDANT_API_ENDPOINT"}, cloudantInstanceUrl)
 			return cloudantInstanceUrl, nil
 		}
 	}
