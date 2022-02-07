@@ -17,6 +17,7 @@ import (
 	"time"
 
 	// Added code for the Power Colo Offering
+
 	"github.com/IBM-Cloud/container-services-go-sdk/kubernetesserviceapiv1"
 	"github.com/IBM-Cloud/container-services-go-sdk/satellitelinkv1"
 	apigateway "github.com/IBM/apigateway-go-sdk/apigatewaycontrollerapiv1"
